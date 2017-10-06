@@ -24,6 +24,7 @@ namespace mfem {
   OccaBilinearForm::OccaBilinearForm(OccaFiniteElementSpace *ofespace_) :
     Operator(ofespace_->GetVSize(),
              ofespace_->GetVSize()) {
+    occa::dbg();
     Init(occa::getDevice(), ofespace_, ofespace_);
   }
 
@@ -31,13 +32,15 @@ namespace mfem {
                                      OccaFiniteElementSpace *ofespace_) :
     Operator(ofespace_->GetVSize(),
              ofespace_->GetVSize()) {
-    Init(device, ofespace_, ofespace_);
+    occa::dbg();
+   Init(device, ofespace_, ofespace_);
   }
 
   OccaBilinearForm::OccaBilinearForm(OccaFiniteElementSpace *otrialFESpace_,
                                      OccaFiniteElementSpace *otestFESpace_) :
     Operator(otrialFESpace_->GetVSize(),
              otestFESpace_->GetVSize()) {
+    occa::dbg();
     Init(occa::getDevice(), otrialFESpace_, otestFESpace_);
   }
 
@@ -46,12 +49,14 @@ namespace mfem {
                                      OccaFiniteElementSpace *otestFESpace_) :
     Operator(otrialFESpace_->GetVSize(),
              otestFESpace_->GetVSize()) {
+    occa::dbg();
     Init(device, otrialFESpace_, otestFESpace_);
   }
 
   void OccaBilinearForm::Init(occa::device device_,
                               OccaFiniteElementSpace *otrialFESpace_,
                               OccaFiniteElementSpace *otestFESpace_) {
+    occa::dbg();
     device = device_;
 
     otrialFESpace = otrialFESpace_;
@@ -254,6 +259,7 @@ namespace mfem {
                                  Operator *A,
                                  OccaVector &X, OccaVector &B,
                                  int copy_interior) {
+    occa::dbg();
     const Operator *P = GetTrialProlongation();
     const Operator *R = GetTrialRestriction();
 
@@ -283,6 +289,7 @@ namespace mfem {
 
   // Matrix vector multiplication.
   void OccaBilinearForm::Mult(const OccaVector &x, OccaVector &y) const {
+    occa::dbg();
     otrialFESpace->GlobalToLocal(x, localX);
     localY = 0;
 
@@ -296,6 +303,7 @@ namespace mfem {
 
   // Matrix transpose vector multiplication.
   void OccaBilinearForm::MultTranspose(const OccaVector &x, OccaVector &y) const {
+    occa::dbg();
     otestFESpace->GlobalToLocal(x, localX);
     localY = 0;
 
@@ -341,6 +349,7 @@ namespace mfem {
                                                    const Array<int> &constraintList_,
                                                    bool own_A_) :
     Operator(A_->Height(), A_->Width()) {
+    occa::dbg();
     Setup(occa::getDevice(), A_, constraintList_, own_A_);
   }
 
@@ -349,6 +358,7 @@ namespace mfem {
                                                    const Array<int> &constraintList_,
                                                    bool own_A_) :
     Operator(A_->Height(), A_->Width()) {
+    occa::dbg();
     Setup(device_, A_, constraintList_, own_A_);
   }
 
