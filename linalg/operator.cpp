@@ -23,38 +23,38 @@ void Operator::FormLinearSystem(const Array<int> &ess_tdof_list,
                                 Operator* &Aout, Vector &X, Vector &B,
                                 int copy_interior)
 {
-  const Operator *P = GetProlongation();
-  const Operator *R = GetRestriction();
-  Operator *rap;
+   const Operator *P = GetProlongation();
+   const Operator *R = GetRestriction();
+   Operator *rap;
 
-  if (P)
-    {
+   if (P)
+   {
       // Variational restriction with P
       B.SetSize(P->Width());
       P->MultTranspose(b, B);
       X.SetSize(R->Height());
       R->Mult(x, X);
       rap = new RAPOperator(*P, *this, *P);
-    }
-  else
-    {
+   }
+   else
+   {
       // rap, X and B point to the same data as this, x and b
       X.NewDataAndSize(x.GetData(), x.Size());
       B.NewDataAndSize(b.GetData(), b.Size());
       rap = this;
-    }
+   }
 
-  if (!copy_interior) { X.SetSubVectorComplement(ess_tdof_list, 0.0); }
+   if (!copy_interior) { X.SetSubVectorComplement(ess_tdof_list, 0.0); }
 
-  ConstrainedOperator *A = new ConstrainedOperator(rap, ess_tdof_list,
-                                                   rap != this);
-  A->EliminateRHS(X, B);
-  Aout = A;
+   ConstrainedOperator *A = new ConstrainedOperator(rap, ess_tdof_list,
+                                                    rap != this);
+   A->EliminateRHS(X, B);
+   Aout = A;
 }
 
 void Operator::RecoverFEMSolution(const Vector &X, const Vector &b, Vector &x)
 {
-  TRecoverFEMSolution(X, b, x);
+   TRecoverFEMSolution(X, b, x);
 }
 
 void Operator::PrintMatlab(std::ostream & out, int n, int m) const

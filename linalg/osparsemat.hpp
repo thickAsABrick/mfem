@@ -19,63 +19,65 @@
 
 #include "occa.hpp"
 
-namespace mfem {
-  class OccaSparseMatrix : public Operator {
-  public:
-    occa::array<int> offsets, indices;
-    occa::array<double> weights;
-    occa::array<int> reorderIndices, mappedIndices;
-    occa::kernel mapKernel, multKernel;
+namespace mfem
+{
+class OccaSparseMatrix : public Operator
+{
+public:
+   occa::array<int> offsets, indices;
+   occa::array<double> weights;
+   occa::array<int> reorderIndices, mappedIndices;
+   occa::kernel mapKernel, multKernel;
 
-    OccaSparseMatrix();
+   OccaSparseMatrix();
 
-    OccaSparseMatrix(const SparseMatrix &m,
-                     const occa::properties &props = occa::properties());
+   OccaSparseMatrix(const SparseMatrix &m,
+                    const occa::properties &props = occa::properties());
 
-    OccaSparseMatrix(const SparseMatrix &m,
-                     occa::array<int> reorderIndices_,
-                     occa::array<int> mappedIndices_,
-                     const occa::properties &props = occa::properties());
+   OccaSparseMatrix(const SparseMatrix &m,
+                    occa::array<int> reorderIndices_,
+                    occa::array<int> mappedIndices_,
+                    const occa::properties &props = occa::properties());
 
-    OccaSparseMatrix(occa::device device, const SparseMatrix &m,
-                     const occa::properties &props = occa::properties());
+   OccaSparseMatrix(occa::device device, const SparseMatrix &m,
+                    const occa::properties &props = occa::properties());
 
-    OccaSparseMatrix(occa::device device, const SparseMatrix &m,
-                     occa::array<int> reorderIndices_,
-                     occa::array<int> mappedIndices_,
-                     const occa::properties &props = occa::properties());
+   OccaSparseMatrix(occa::device device, const SparseMatrix &m,
+                    occa::array<int> reorderIndices_,
+                    occa::array<int> mappedIndices_,
+                    const occa::properties &props = occa::properties());
 
-    OccaSparseMatrix(const int height_, const int width_,
-                     occa::array<int> offsets_,
-                     occa::array<int> indices_,
-                     occa::array<double> weights_,
-                     const occa::properties &props = occa::properties());
+   OccaSparseMatrix(const int height_, const int width_,
+                    occa::array<int> offsets_,
+                    occa::array<int> indices_,
+                    occa::array<double> weights_,
+                    const occa::properties &props = occa::properties());
 
-    OccaSparseMatrix(const int height_, const int width_,
-                     occa::array<int> offsets_,
-                     occa::array<int> indices_,
-                     occa::array<double> weights_,
-                     occa::array<int> reorderIndices_,
-                     occa::array<int> mappedIndices_,
-                     const occa::properties &props = occa::properties());
+   OccaSparseMatrix(const int height_, const int width_,
+                    occa::array<int> offsets_,
+                    occa::array<int> indices_,
+                    occa::array<double> weights_,
+                    occa::array<int> reorderIndices_,
+                    occa::array<int> mappedIndices_,
+                    const occa::properties &props = occa::properties());
 
-    void Setup(occa::device device, const SparseMatrix &m,
-               const occa::properties &props);
+   void Setup(occa::device device, const SparseMatrix &m,
+              const occa::properties &props);
 
-    void Setup(occa::device device, const SparseMatrix &m,
-               occa::array<int> reorderIndices_,
-               occa::array<int> mappedIndices_,
-               const occa::properties &props);
+   void Setup(occa::device device, const SparseMatrix &m,
+              occa::array<int> reorderIndices_,
+              occa::array<int> mappedIndices_,
+              const occa::properties &props);
 
-    void SetupKernel(occa::device device,
-                     const occa::properties &props);
+   void SetupKernel(occa::device device,
+                    const occa::properties &props);
 
-    virtual void Mult(const OccaVector &x, OccaVector &y) const;
-  };
+   virtual void Mult(const OccaVector &x, OccaVector &y) const;
+};
 
-  OccaSparseMatrix* CreateMappedSparseMatrix(occa::device device,
-                                             const SparseMatrix &m,
-                                             const occa::properties &props = occa::properties());
+OccaSparseMatrix* CreateMappedSparseMatrix(occa::device device,
+                                           const SparseMatrix &m,
+                                           const occa::properties &props = occa::properties());
 }
 
 #  endif

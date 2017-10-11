@@ -22,54 +22,56 @@
 #include "../linalg/ovector.hpp"
 #include "ofespace.hpp"
 
-namespace mfem {
-  class OccaIntegrator;
-  class OccaDofQuadMaps;
+namespace mfem
+{
+class OccaIntegrator;
+class OccaDofQuadMaps;
 
-  extern std::map<std::string, occa::kernel> gridFunctionKernels;
+extern std::map<std::string, occa::kernel> gridFunctionKernels;
 
-  occa::kernel GetGridFunctionKernel(occa::device device,
-                                     OccaFiniteElementSpace &fespace,
-                                     const IntegrationRule &ir);
+occa::kernel GetGridFunctionKernel(occa::device device,
+                                   OccaFiniteElementSpace &fespace,
+                                   const IntegrationRule &ir);
 
-  class OccaGridFunction : public OccaVector {
-  protected:
-    OccaFiniteElementSpace *ofespace;
-    long sequence;
+class OccaGridFunction : public OccaVector
+{
+protected:
+   OccaFiniteElementSpace *ofespace;
+   long sequence;
 
-    occa::kernel gridFuncToQuad[3];
+   occa::kernel gridFuncToQuad[3];
 
-  public:
-    OccaGridFunction();
+public:
+   OccaGridFunction();
 
-    OccaGridFunction(OccaFiniteElementSpace *ofespace_);
+   OccaGridFunction(OccaFiniteElementSpace *ofespace_);
 
-    OccaGridFunction(occa::device device_,
-                     OccaFiniteElementSpace *ofespace_);
+   OccaGridFunction(occa::device device_,
+                    OccaFiniteElementSpace *ofespace_);
 
-    OccaGridFunction(OccaFiniteElementSpace *ofespace_,
-                     OccaVectorRef ref);
+   OccaGridFunction(OccaFiniteElementSpace *ofespace_,
+                    OccaVectorRef ref);
 
-    OccaGridFunction(const OccaGridFunction &gf);
+   OccaGridFunction(const OccaGridFunction &gf);
 
-    OccaGridFunction& operator = (double value);
-    OccaGridFunction& operator = (const OccaVector &v);
-    OccaGridFunction& operator = (const OccaVectorRef &v);
-    OccaGridFunction& operator = (const OccaGridFunction &gf);
+   OccaGridFunction& operator = (double value);
+   OccaGridFunction& operator = (const OccaVector &v);
+   OccaGridFunction& operator = (const OccaVectorRef &v);
+   OccaGridFunction& operator = (const OccaGridFunction &gf);
 
-    void SetGridFunction(GridFunction &gf);
+   void SetGridFunction(GridFunction &gf);
 
-    void GetTrueDofs(OccaVector &v) const;
-    void SetFromTrueDofs(const OccaVector &v);
+   void GetTrueDofs(OccaVector &v) const;
+   void SetFromTrueDofs(const OccaVector &v);
 
-    FiniteElementSpace* GetFESpace();
-    const FiniteElementSpace* GetFESpace() const;
+   FiniteElementSpace* GetFESpace();
+   const FiniteElementSpace* GetFESpace() const;
 
-    void ToQuad(const IntegrationRule &ir,
-                OccaVector &quadValues);
+   void ToQuad(const IntegrationRule &ir,
+               OccaVector &quadValues);
 
-    void Distribute(const OccaVector &v);
-  };
+   void Distribute(const OccaVector &v);
+};
 };
 
 #  endif

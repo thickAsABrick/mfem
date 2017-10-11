@@ -734,13 +734,16 @@ void GridFunction::ReorderByVDim(const bool force)
    double *temp = new double[size];
 
    int k = 0;
-   for (int j = 0; j < ndofs; j++) {
-     for (int i = 0; i < vdim; i++) {
-       temp[k++] = data[j+i*ndofs];
-     }
+   for (int j = 0; j < ndofs; j++)
+   {
+      for (int i = 0; i < vdim; i++)
+      {
+         temp[k++] = data[j+i*ndofs];
+      }
    }
-   for (int i = 0; i < size; i++) {
-     data[i] = temp[i];
+   for (int i = 0; i < size; i++)
+   {
+      data[i] = temp[i];
    }
 
    delete [] temp;

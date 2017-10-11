@@ -19,42 +19,45 @@
 
 #include "occa.hpp"
 
-namespace mfem {
-  // [MISSING] Proper destructors
-  void CreateRPOperators(occa::device device,
-                         const int size,
-                         const SparseMatrix *R, const Operator *P,
-                         Operator *&OccaR, Operator *&OccaP);
+namespace mfem
+{
+// [MISSING] Proper destructors
+void CreateRPOperators(occa::device device,
+                       const int size,
+                       const SparseMatrix *R, const Operator *P,
+                       Operator *&OccaR, Operator *&OccaP);
 
-  class OccaRestrictionOperator : public Operator {
-  protected:
-    int entries;
-    occa::array<int> trueIndices;
-    occa::kernel multOp, multTransposeOp;
+class OccaRestrictionOperator : public Operator
+{
+protected:
+   int entries;
+   occa::array<int> trueIndices;
+   occa::kernel multOp, multTransposeOp;
 
-  public:
-    OccaRestrictionOperator(occa::device device,
-                            const int height_, const int width_,
-                            occa::array<int> indices);
+public:
+   OccaRestrictionOperator(occa::device device,
+                           const int height_, const int width_,
+                           occa::array<int> indices);
 
-    virtual void Mult(const OccaVector &x, OccaVector &y) const;
-    virtual void MultTranspose(const OccaVector &x, OccaVector &y) const;
-  };
+   virtual void Mult(const OccaVector &x, OccaVector &y) const;
+   virtual void MultTranspose(const OccaVector &x, OccaVector &y) const;
+};
 
-  class OccaProlongationOperator : public Operator {
-  protected:
-    const Operator *pmat;
-    OccaSparseMatrix multOp, multTransposeOp;
+class OccaProlongationOperator : public Operator
+{
+protected:
+   const Operator *pmat;
+   OccaSparseMatrix multOp, multTransposeOp;
 
-  public:
-    OccaProlongationOperator(OccaSparseMatrix &multOp_,
-                             OccaSparseMatrix &multTransposeOp_);
+public:
+   OccaProlongationOperator(OccaSparseMatrix &multOp_,
+                            OccaSparseMatrix &multTransposeOp_);
 
-    OccaProlongationOperator(const Operator *pmat_);
+   OccaProlongationOperator(const Operator *pmat_);
 
-    virtual void Mult(const OccaVector &x, OccaVector &y) const;
-    virtual void MultTranspose(const OccaVector &x, OccaVector &y) const;
-  };
+   virtual void Mult(const OccaVector &x, OccaVector &y) const;
+   virtual void MultTranspose(const OccaVector &x, OccaVector &y) const;
+};
 }
 
 #  endif

@@ -201,14 +201,14 @@ private:
    }
 
 public:
-  IntegrationRule() :
-     Array<IntegrationPoint>(),
-     Order(0) { }
+   IntegrationRule() :
+      Array<IntegrationPoint>(),
+      Order(0) { }
 
    /// Construct an integration rule with given number of points
-    explicit IntegrationRule(int NP) :
-     Array<IntegrationPoint>(NP),
-     Order(0)
+   explicit IntegrationRule(int NP) :
+      Array<IntegrationPoint>(NP),
+      Order(0)
    {
       for (int i = 0; i < this->Size(); i++)
       {

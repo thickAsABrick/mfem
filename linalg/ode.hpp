@@ -70,14 +70,16 @@ public:
        - If the previous rule has to be broken, e.g. to restart a time stepping
          sequence, then the ODE solver must be re-initialized by calling Init()
          between the two Step() calls. */
-     virtual void Step(Vector &x, double &t, double &dt) {
-        mfem_error("ODESolver::Step(Vector) is not overloaded!");
-     }
-  #if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
-     virtual void Step(OccaVector &x, double &t, double &dt) {
-        mfem_error("ODESolver::Step(OccaVector) is not overloaded!");
-     }
-  #endif
+   virtual void Step(Vector &x, double &t, double &dt)
+   {
+      mfem_error("ODESolver::Step(Vector) is not overloaded!");
+   }
+#if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
+   virtual void Step(OccaVector &x, double &t, double &dt)
+   {
+      mfem_error("ODESolver::Step(OccaVector) is not overloaded!");
+   }
+#endif
 
    /// Perform time integration from time @a t [in] to time @a tf [in].
    /** @param[in,out] x   Approximate solution.
@@ -192,7 +194,7 @@ private:
 
 public:
    TExplicitRKSolver(int _s, const double *_a, const double *_b,
-                    const double *_c);
+                     const double *_c);
 
    virtual void Init(TimeDependentOperator &_f);
 

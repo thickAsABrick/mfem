@@ -15,51 +15,64 @@
 
 #include "outils.hpp"
 
-namespace mfem {
-  Vector& GetOccaHostVector(const int id, const int64_t size) {
-    static std::vector<Vector*> v;
-    if (v.size() <= (size_t) id) {
-      for (int i = (int) v.size(); i < (id + 1); ++i) {
-        v.push_back(new Vector);
+namespace mfem
+{
+Vector& GetOccaHostVector(const int id, const int64_t size)
+{
+   static std::vector<Vector*> v;
+   if (v.size() <= (size_t) id)
+   {
+      for (int i = (int) v.size(); i < (id + 1); ++i)
+      {
+         v.push_back(new Vector);
       }
-    }
-    if (size >= 0) {
+   }
+   if (size >= 0)
+   {
       v[id]->SetSize(size);
-    }
-    return *(v[id]);
-  }
+   }
+   return *(v[id]);
+}
 
-  void OccaMult(const Operator &op,
-                const OccaVector &x, OccaVector &y) {
-    occa::device device = y.GetDevice();
-    if (device.hasSeparateMemorySpace()) {
+void OccaMult(const Operator &op,
+              const OccaVector &x, OccaVector &y)
+{
+   occa::device device = y.GetDevice();
+   if (device.hasSeparateMemorySpace())
+   {
       Vector &hostX = GetOccaHostVector(0, op.Width());
       Vector &hostY = GetOccaHostVector(1, op.Height());
       hostX = x;
       op.Mult(hostX, hostY);
       y = hostY;
-    } else {
+   }
+   else
+   {
       Vector hostX((double*) x.GetData().ptr(), x.Size());
       Vector hostY((double*) y.GetData().ptr(), y.Size());
       op.Mult(hostX, hostY);
-    }
-  }
+   }
+}
 
-  void OccaMultTranspose(const Operator &op,
-                         const OccaVector &x, OccaVector &y) {
-    occa::device device = y.GetDevice();
-    if (device.hasSeparateMemorySpace()) {
+void OccaMultTranspose(const Operator &op,
+                       const OccaVector &x, OccaVector &y)
+{
+   occa::device device = y.GetDevice();
+   if (device.hasSeparateMemorySpace())
+   {
       Vector &hostX = GetOccaHostVector(1, op.Height());
       Vector &hostY = GetOccaHostVector(0, op.Width());
       hostX = x;
       op.MultTranspose(hostX, hostY);
       y = hostY;
-    } else {
+   }
+   else
+   {
       Vector hostX((double*) x.GetData().ptr(), x.Size());
       Vector hostY((double*) y.GetData().ptr(), y.Size());
       op.MultTranspose(hostX, hostY);
-    }
-  }
+   }
+}
 }
 
 #endif

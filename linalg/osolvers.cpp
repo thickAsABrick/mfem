@@ -16,17 +16,20 @@
 #include "../general/outils.hpp"
 #include "osolvers.hpp"
 
-namespace mfem {
-  OccaSolverWrapper::OccaSolverWrapper(Solver &s) :
-    sol(s) {}
+namespace mfem
+{
+OccaSolverWrapper::OccaSolverWrapper(Solver &s) :
+   sol(s) {}
 
-  void OccaSolverWrapper::Mult(const OccaVector &x, OccaVector &y) const {
-    OccaMult(sol, x, y);
-  }
+void OccaSolverWrapper::Mult(const OccaVector &x, OccaVector &y) const
+{
+   OccaMult(sol, x, y);
+}
 
-  void OccaSolverWrapper::MultTranspose(const OccaVector &x, OccaVector &y) const {
-    OccaMultTranspose(sol, x, y);
-  }
+void OccaSolverWrapper::MultTranspose(const OccaVector &x, OccaVector &y) const
+{
+   OccaMultTranspose(sol, x, y);
+}
 }
 
 #endif

@@ -33,7 +33,7 @@ namespace mfem
 {
 
 #if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
-  class OccaVector;
+class OccaVector;
 #endif
 
 /** Count the number of entries in an array of doubles for which isfinite

@@ -18,103 +18,105 @@
 #include "occa.hpp"
 #include "fespace.hpp"
 
-namespace mfem {
-  class OccaFiniteElementSpace {
-  protected:
-    occa::device device;
-    FiniteElementSpace *fespace;
+namespace mfem
+{
+class OccaFiniteElementSpace
+{
+protected:
+   occa::device device;
+   FiniteElementSpace *fespace;
 
-    int *elementDofMap;
-    int *elementDofMapInverse;
+   int *elementDofMap;
+   int *elementDofMapInverse;
 
-    occa::array<int> globalToLocalOffsets;
-    occa::array<int> globalToLocalIndices;
-    occa::array<int> localToGlobalMap;
-    occa::kernel globalToLocalKernel, localToGlobalKernel;
+   occa::array<int> globalToLocalOffsets;
+   occa::array<int> globalToLocalIndices;
+   occa::array<int> localToGlobalMap;
+   occa::kernel globalToLocalKernel, localToGlobalKernel;
 
-    Ordering::Type ordering;
+   Ordering::Type ordering;
 
-    int globalDofs, localDofs;
-    int vdim;
+   int globalDofs, localDofs;
+   int vdim;
 
-    Operator *restrictionOp, *prolongationOp;
+   Operator *restrictionOp, *prolongationOp;
 
-  public:
-    OccaFiniteElementSpace(Mesh *mesh,
-                           const FiniteElementCollection *fec,
-                           Ordering::Type ordering_);
+public:
+   OccaFiniteElementSpace(Mesh *mesh,
+                          const FiniteElementCollection *fec,
+                          Ordering::Type ordering_);
 
-    OccaFiniteElementSpace(occa::device device_,
-                           Mesh *mesh,
-                           const FiniteElementCollection *fec,
-                           Ordering::Type ordering_);
+   OccaFiniteElementSpace(occa::device device_,
+                          Mesh *mesh,
+                          const FiniteElementCollection *fec,
+                          Ordering::Type ordering_);
 
-    OccaFiniteElementSpace(Mesh *mesh,
-                           const FiniteElementCollection *fec,
-                           const int vdim_ = 1,
-                           Ordering::Type ordering_ = Ordering::byVDIM);
+   OccaFiniteElementSpace(Mesh *mesh,
+                          const FiniteElementCollection *fec,
+                          const int vdim_ = 1,
+                          Ordering::Type ordering_ = Ordering::byVDIM);
 
 
-    OccaFiniteElementSpace(occa::device device_,
-                           Mesh *mesh,
-                           const FiniteElementCollection *fec,
-                           const int vdim_ = 1,
-                           Ordering::Type ordering_ = Ordering::byVDIM);
+   OccaFiniteElementSpace(occa::device device_,
+                          Mesh *mesh,
+                          const FiniteElementCollection *fec,
+                          const int vdim_ = 1,
+                          Ordering::Type ordering_ = Ordering::byVDIM);
 
-    ~OccaFiniteElementSpace();
+   ~OccaFiniteElementSpace();
 
-    void Init(occa::device device_,
-              Mesh *mesh,
-              const FiniteElementCollection *fec,
-              const int vdim_,
-              Ordering::Type ordering_ = Ordering::byVDIM);
+   void Init(occa::device device_,
+             Mesh *mesh,
+             const FiniteElementCollection *fec,
+             const int vdim_,
+             Ordering::Type ordering_ = Ordering::byVDIM);
 
-    void SetupLocalGlobalMaps();
-    void SetupOperators();
-    void SetupKernels();
+   void SetupLocalGlobalMaps();
+   void SetupOperators();
+   void SetupKernels();
 
-    occa::device GetDevice();
+   occa::device GetDevice();
 
-    Mesh* GetMesh();
-    const Mesh* GetMesh() const;
+   Mesh* GetMesh();
+   const Mesh* GetMesh() const;
 
-    FiniteElementSpace* GetFESpace();
-    const FiniteElementSpace* GetFESpace() const;
+   FiniteElementSpace* GetFESpace();
+   const FiniteElementSpace* GetFESpace() const;
 
-    bool isDistributed() const;
-    bool hasTensorBasis() const;
+   bool isDistributed() const;
+   bool hasTensorBasis() const;
 
-    Ordering::Type GetOrdering() const;
+   Ordering::Type GetOrdering() const;
 
-    int GetGlobalDofs() const;
-    int GetLocalDofs() const;
+   int GetGlobalDofs() const;
+   int GetLocalDofs() const;
 
-    int GetDim() const;
-    int GetVDim() const;
+   int GetDim() const;
+   int GetVDim() const;
 
-    int GetVSize() const;
-    int GetTrueVSize() const;
-    int GetGlobalVSize() const;
-    int GetGlobalTrueVSize() const;
+   int GetVSize() const;
+   int GetTrueVSize() const;
+   int GetGlobalVSize() const;
+   int GetGlobalTrueVSize() const;
 
-    int GetNE() const;
+   int GetNE() const;
 
-    const FiniteElementCollection* FEColl() const;
-    const FiniteElement* GetFE(const int idx) const;
+   const FiniteElementCollection* FEColl() const;
+   const FiniteElement* GetFE(const int idx) const;
 
-    const int* GetElementDofMap() const;
-    const int* GetElementDofMapInverse() const;
+   const int* GetElementDofMap() const;
+   const int* GetElementDofMapInverse() const;
 
-    const Operator* GetRestrictionOperator();
-    const Operator* GetProlongationOperator();
+   const Operator* GetRestrictionOperator();
+   const Operator* GetProlongationOperator();
 
-    const occa::array<int> GetLocalToGlobalMap() const;
+   const occa::array<int> GetLocalToGlobalMap() const;
 
-    void GlobalToLocal(const OccaVector &globalVec,
-                       OccaVector &localVec) const;
-    void LocalToGlobal(const OccaVector &localVec,
-                       OccaVector &globalVec) const;
-  };
+   void GlobalToLocal(const OccaVector &globalVec,
+                      OccaVector &localVec) const;
+   void LocalToGlobal(const OccaVector &localVec,
+                      OccaVector &globalVec) const;
+};
 }
 
 #  endif

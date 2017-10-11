@@ -16,20 +16,24 @@
 #include "ointerpolation.hpp"
 #include "../general/outils.hpp"
 
-namespace mfem {
-  void CreateRPOperators(occa::device device,
-                         const int size,
-                         const SparseMatrix *R, const Operator *P,
-                         Operator *&OccaR, Operator *&OccaP) {
-    if (!P) {
+namespace mfem
+{
+void CreateRPOperators(occa::device device,
+                       const int size,
+                       const SparseMatrix *R, const Operator *P,
+                       Operator *&OccaR, Operator *&OccaP)
+{
+   if (!P)
+   {
       OccaR = new OccaIdentityOperator(size);
       OccaP = new OccaIdentityOperator(size);
       return;
-    }
+   }
 
-    const SparseMatrix *pmat = dynamic_cast<const SparseMatrix*>(P);
+   const SparseMatrix *pmat = dynamic_cast<const SparseMatrix*>(P);
 
-    if (R) {
+   if (R)
+   {
       OccaSparseMatrix *occaR = CreateMappedSparseMatrix(device, *R);
       occa::array<int> reorderIndices = occaR->reorderIndices;
       delete occaR;
@@ -37,72 +41,88 @@ namespace mfem {
       OccaR = new OccaRestrictionOperator(device,
                                           R->Height(), R->Width(),
                                           reorderIndices);
-    }
+   }
 
-    if (pmat) {
+   if (pmat)
+   {
       const SparseMatrix *pmatT = Transpose(*pmat);
 
       OccaSparseMatrix *occaP  = CreateMappedSparseMatrix(device, *pmat);
       OccaSparseMatrix *occaPT = CreateMappedSparseMatrix(device, *pmatT);
 
       OccaP = new OccaProlongationOperator(*occaP, *occaPT);
-    } else {
+   }
+   else
+   {
       OccaP = new OccaProlongationOperator(P);
-    }
-  }
+   }
+}
 
-  OccaRestrictionOperator::OccaRestrictionOperator(occa::device device,
-                                                   const int height_, const int width_,
-                                                   occa::array<int> indices) :
-    Operator(height_, width_) {
+OccaRestrictionOperator::OccaRestrictionOperator(occa::device device,
+                                                 const int height_, const int width_,
+                                                 occa::array<int> indices) :
+   Operator(height_, width_)
+{
 
-    entries     = indices.size() / 2;
-    trueIndices = indices;
+   entries     = indices.size() / 2;
+   trueIndices = indices;
 
-    multOp = device.buildKernel("occa://mfem/linalg/mappings.okl",
-                                "ExtractSubVector",
-                                "defines: { TILESIZE: 256 }");
+   multOp = device.buildKernel("occa://mfem/linalg/mappings.okl",
+                               "ExtractSubVector",
+                               "defines: { TILESIZE: 256 }");
 
-    multTransposeOp = device.buildKernel("occa://mfem/linalg/mappings.okl",
-                                         "SetSubVector",
-                                         "defines: { TILESIZE: 256 }");
-  }
+   multTransposeOp = device.buildKernel("occa://mfem/linalg/mappings.okl",
+                                        "SetSubVector",
+                                        "defines: { TILESIZE: 256 }");
+}
 
-  void OccaRestrictionOperator::Mult(const OccaVector &x, OccaVector &y) const {
-    multOp(entries, trueIndices, x, y);
-  }
+void OccaRestrictionOperator::Mult(const OccaVector &x, OccaVector &y) const
+{
+   multOp(entries, trueIndices, x, y);
+}
 
-  void OccaRestrictionOperator::MultTranspose(const OccaVector &x, OccaVector &y) const {
-    y = 0;
-    multTransposeOp(entries, trueIndices, x, y);
-  }
+void OccaRestrictionOperator::MultTranspose(const OccaVector &x,
+                                            OccaVector &y) const
+{
+   y = 0;
+   multTransposeOp(entries, trueIndices, x, y);
+}
 
-  OccaProlongationOperator::OccaProlongationOperator(OccaSparseMatrix &multOp_,
-                                                     OccaSparseMatrix &multTransposeOp_) :
-    Operator(multOp_.Height(), multOp_.Width()),
-    pmat(NULL),
-    multOp(multOp_),
-    multTransposeOp(multTransposeOp_) {}
+OccaProlongationOperator::OccaProlongationOperator(OccaSparseMatrix &multOp_,
+                                                   OccaSparseMatrix &multTransposeOp_) :
+   Operator(multOp_.Height(), multOp_.Width()),
+   pmat(NULL),
+   multOp(multOp_),
+   multTransposeOp(multTransposeOp_) {}
 
-  OccaProlongationOperator::OccaProlongationOperator(const Operator *pmat_) :
-    Operator(pmat_->Height(), pmat_->Width()),
-    pmat(pmat_) {}
+OccaProlongationOperator::OccaProlongationOperator(const Operator *pmat_) :
+   Operator(pmat_->Height(), pmat_->Width()),
+   pmat(pmat_) {}
 
-  void OccaProlongationOperator::Mult(const OccaVector &x, OccaVector &y) const {
-    if (pmat) {
+void OccaProlongationOperator::Mult(const OccaVector &x, OccaVector &y) const
+{
+   if (pmat)
+   {
       OccaMult(*pmat, x, y);
-    } else {
+   }
+   else
+   {
       multOp.Mult(x, y);
-    }
-  }
+   }
+}
 
-  void OccaProlongationOperator::MultTranspose(const OccaVector &x, OccaVector &y) const {
-    if (pmat) {
+void OccaProlongationOperator::MultTranspose(const OccaVector &x,
+                                             OccaVector &y) const
+{
+   if (pmat)
+   {
       OccaMultTranspose(*pmat, x, y);
-    } else {
+   }
+   else
+   {
       multTransposeOp.Mult(x, y);
-    }
-  }
+   }
+}
 }
 
 #endif

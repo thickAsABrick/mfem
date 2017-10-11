@@ -111,8 +111,8 @@ int main(int argc, char *argv[])
                   "Number of times to refine the mesh uniformly.");
    args.AddOption(&order, "-o", "--order",
                   "Order (degree) of the finite elements.");
-  args.AddOption(&basis_type, "-b", "--basis-type",
-                 "Basis: G - Gauss-Lobatto, P - Positive, U - Uniform");
+   args.AddOption(&basis_type, "-b", "--basis-type",
+                  "Basis: G - Gauss-Lobatto, P - Positive, U - Uniform");
    args.AddOption(&ode_solver_type, "-s", "--ode-solver",
                   "ODE solver: 1 - Backward Euler, 2 - SDIRK2, 3 - SDIRK3,\n\t"
                   "\t   11 - Forward Euler, 12 - RK2, 13 - RK3 SSP, 14 - RK4.");

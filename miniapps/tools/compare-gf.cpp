@@ -29,48 +29,55 @@
 
 #include "mfem.hpp"
 
-mfem::Vector ReadGF(const char *filename) {
-  std::ifstream in(filename);
-  std::string line;
+mfem::Vector ReadGF(const char *filename)
+{
+   std::ifstream in(filename);
+   std::string line;
 
-  for (int i = 0; i < 5; ++i) {
-    std::getline(in, line);
-  }
+   for (int i = 0; i < 5; ++i)
+   {
+      std::getline(in, line);
+   }
 
-  std::vector<double> v;
-  double entry;
-  while (in >> entry) {
-    v.push_back(entry);
-  }
+   std::vector<double> v;
+   double entry;
+   while (in >> entry)
+   {
+      v.push_back(entry);
+   }
 
-  const int entries = v.size();
-  double *data = new double[entries];
-  for (int i = 0; i < entries; ++i) {
-    data[i] = v[i];
-  }
+   const int entries = v.size();
+   double *data = new double[entries];
+   for (int i = 0; i < entries; ++i)
+   {
+      data[i] = v[i];
+   }
 
-  return mfem::Vector(data, entries);
+   return mfem::Vector(data, entries);
 }
 
-int main(const int argc, const char **argv) {
-  if (argc < 2) {
-    std::cout << argv[0] << ": Must take 1 or 2 sol.gf file inputs to compare\n";
-    // mfem-test doesn't take custom arguments
-    // Return 0 to make Travis CI happy
-    return 0;
-  }
+int main(const int argc, const char **argv)
+{
+   if (argc < 2)
+   {
+      std::cout << argv[0] << ": Must take 1 or 2 sol.gf file inputs to compare\n";
+      // mfem-test doesn't take custom arguments
+      // Return 0 to make Travis CI happy
+      return 0;
+   }
 
-  mfem::Vector diff = ReadGF(argv[1]);
-  if (argc > 2) {
-    diff -= ReadGF(argv[2]);
-  }
+   mfem::Vector diff = ReadGF(argv[1]);
+   if (argc > 2)
+   {
+      diff -= ReadGF(argv[2]);
+   }
 
-  std::cout << "Max       : " << diff.Max() << '\n'
-            << "Min       : " << diff.Min() << '\n'
-            << "L1 Norm   : " << diff.Norml1() << '\n'
-            << "L2 Norm   : " << diff.Norml2() << '\n'
-            << "L3 Norm   : " << diff.Normlp(3) << '\n'
-            << "LInf Norm : " << diff.Normlinf() << '\n';
+   std::cout << "Max       : " << diff.Max() << '\n'
+             << "Min       : " << diff.Min() << '\n'
+             << "L1 Norm   : " << diff.Norml1() << '\n'
+             << "L2 Norm   : " << diff.Norml2() << '\n'
+             << "L3 Norm   : " << diff.Normlp(3) << '\n'
+             << "LInf Norm : " << diff.Normlinf() << '\n';
 
-  return 0;
+   return 0;
 }

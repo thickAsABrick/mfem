@@ -334,7 +334,7 @@ protected:
 
    MixedScalarVectorIntegrator(VectorCoefficient &vq, bool _transpose = false,
                                bool _cross_2d = false)
-      : VQ(&vq), transpose(_transpose) , cross_2d(_cross_2d) {}
+      : VQ(&vq), transpose(_transpose), cross_2d(_cross_2d) {}
 
    inline virtual bool VerifyFiniteElementTypes(
       const FiniteElement & trial_fe,
@@ -1575,7 +1575,8 @@ protected:
    }
 };
 
-const IntegrationRule &GetDiffusionIntegrationRule(const FiniteElement &trial_fe,
+const IntegrationRule &GetDiffusionIntegrationRule(const FiniteElement
+                                                   &trial_fe,
                                                    const FiniteElement &test_fe);
 
 /** Class for integrating the bilinear form a(u,v) := (Q grad u, grad v) where Q
@@ -1602,8 +1603,8 @@ public:
    DiffusionIntegrator (MatrixCoefficient &q) : MQ(&q) { Q = NULL; }
 
    /// Return IntRule or the default integration rule
-  virtual const IntegrationRule &GetIntegrationRule(const FiniteElement &trial_fe,
-                                                    const FiniteElement &test_fe);
+   virtual const IntegrationRule &GetIntegrationRule(const FiniteElement &trial_fe,
+                                                     const FiniteElement &test_fe);
 
    /** Given a particular Finite Element
        computes the element stiffness matrix elmat. */

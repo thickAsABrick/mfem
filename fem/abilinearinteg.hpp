@@ -16,33 +16,35 @@
 #include "AcroTensor.hpp"
 #include "obilininteg.hpp"
 
-namespace mfem {
+namespace mfem
+{
 
-class AcroIntegrator : public OccaIntegrator {
+class AcroIntegrator : public OccaIntegrator
+{
 protected:
-  acro::TensorEngine TE;
+   acro::TensorEngine TE;
 
-  int nDim;
-  int nElem;
-  int nDof;
-  int nQuad;
-  int nDof1D;
-  int nQuad1D;
-  bool onGPU;
+   int nDim;
+   int nElem;
+   int nDof;
+   int nQuad;
+   int nDof1D;
+   int nQuad1D;
+   bool onGPU;
 
-  acro::Tensor B, G;         //Basis and dbasis evaluated on the quad points
-  acro::Tensor W;            //Integration weights
+   acro::Tensor B, G;         //Basis and dbasis evaluated on the quad points
+   acro::Tensor W;            //Integration weights
 
 public:
-  AcroIntegrator();
-  virtual ~AcroIntegrator();
-  virtual void Setup();
+   AcroIntegrator();
+   virtual ~AcroIntegrator();
+   virtual void Setup();
 
-  virtual OccaIntegrator* CreateInstance() = 0;
-  virtual std::string GetName() = 0;
-  virtual void Assemble() = 0;
-  virtual void AssembleMatrix() = 0;
-  virtual void MultAdd(OccaVector &x, OccaVector &y) = 0;
+   virtual OccaIntegrator* CreateInstance() = 0;
+   virtual std::string GetName() = 0;
+   virtual void Assemble() = 0;
+   virtual void AssembleMatrix() = 0;
+   virtual void MultAdd(OccaVector &x, OccaVector &y) = 0;
 };
 
 }

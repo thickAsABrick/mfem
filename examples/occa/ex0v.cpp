@@ -53,7 +53,9 @@ double InitialCondition(const Vector& x)
 {
    double r2 = 0;
    for (int i = 0; i < x.Size(); i++)
+   {
       r2 += (x(i)-0.5)*(x(i)-0.5);
+   }
    return std::exp(-r2);
 }
 
@@ -61,12 +63,18 @@ void VectorInitialCondition(const Vector& x, Vector& v)
 {
    double r2 = 0;
    for (int i = 0; i < x.Size(); i++)
+   {
       r2 += (x(i)-0.5)*(x(i)-0.5);
+   }
    v(0) = std::exp(-r2);
    if (x.Size() > 1)
+   {
       v(1) = std::exp(-r2);
+   }
    if (x.Size() > 2)
+   {
       v(2) = std::exp(r2);
+   }
 }
 
 
@@ -113,10 +121,11 @@ int main(int argc, char *argv[])
    args.PrintOptions(cout);
 
 #ifndef MFEM_USE_ACROTENSOR
-  if (use_acrotensor) {
-    cout << "MFEM not compiled with Acrotensor, reverting to OCCA\n";
-    use_acrotensor = false;
-  }
+   if (use_acrotensor)
+   {
+      cout << "MFEM not compiled with Acrotensor, reverting to OCCA\n";
+      use_acrotensor = false;
+   }
 #endif
 
    // Set the OCCA device to run example in
@@ -192,10 +201,13 @@ int main(int argc, char *argv[])
    tic_toc.Start();
    OccaBilinearForm *a = new OccaBilinearForm(ofespace);
 
-   if (use_acrotensor) {
+   if (use_acrotensor)
+   {
       mfem_error("Not yet implemented");
       // a->AddDomainIntegrator(new AcroMassIntegrator(1.0));
-   } else {
+   }
+   else
+   {
       a->AddDomainIntegrator(new OccaVectorMassIntegrator(1.0));
    }
 

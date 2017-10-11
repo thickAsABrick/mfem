@@ -138,7 +138,8 @@ void TRK4Solver<TVector>::Step(TVector &x, double &t, double &dt)
 }
 
 template <class TVector>
-TExplicitRKSolver<TVector>::TExplicitRKSolver(int _s, const double *_a, const double *_b,
+TExplicitRKSolver<TVector>::TExplicitRKSolver(int _s, const double *_a,
+                                              const double *_b,
                                               const double *_c)
 {
    s = _s;

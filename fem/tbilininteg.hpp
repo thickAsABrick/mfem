@@ -459,7 +459,7 @@ struct TDiffusionKernel<3,3,complex_t>
                          "incompatible dimensions");
       MFEM_FLOPS_ADD(M); // just need to count Q/detJ
       for (int i = 0; i < M; i++)
-        {
+      {
          typedef typename T_result_t::Jt_type::data_type real_t;
          TMatrix<3,3,real_t> adj_J;
          const complex_t w_det_J =

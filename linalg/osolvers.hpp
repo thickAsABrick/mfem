@@ -18,65 +18,68 @@
 #include "solvers.hpp"
 #include "ovector.hpp"
 
-namespace mfem {
-  class OccaSolverWrapper : public Solver {
-    Solver &sol;
+namespace mfem
+{
+class OccaSolverWrapper : public Solver
+{
+   Solver &sol;
 
-  public:
-    OccaSolverWrapper(Solver &s);
+public:
+   OccaSolverWrapper(Solver &s);
 
-    inline virtual void SetOperator(const Operator &op) {}
+   inline virtual void SetOperator(const Operator &op) {}
 
-    virtual void Mult(const OccaVector &x, OccaVector &y) const;
-    virtual void MultTranspose(const OccaVector &x, OccaVector &y) const;
-  };
+   virtual void Mult(const OccaVector &x, OccaVector &y) const;
+   virtual void MultTranspose(const OccaVector &x, OccaVector &y) const;
+};
 
-  typedef TCGSolver<OccaVector> OccaCGSolver;
+typedef TCGSolver<OccaVector> OccaCGSolver;
 
-  inline void CG(const Operator &A, const OccaVector &b, OccaVector &x,
-                 int print_iter = 0, int max_num_iter = 1000,
-                 double RTOLERANCE = 1e-12, double ATOLERANCE = 1e-24)
-  {
-    TCG<OccaVector>(A, b, x,
-                    print_iter, max_num_iter,
-                    RTOLERANCE, ATOLERANCE);
-  }
+inline void CG(const Operator &A, const OccaVector &b, OccaVector &x,
+               int print_iter = 0, int max_num_iter = 1000,
+               double RTOLERANCE = 1e-12, double ATOLERANCE = 1e-24)
+{
+   TCG<OccaVector>(A, b, x,
+                   print_iter, max_num_iter,
+                   RTOLERANCE, ATOLERANCE);
+}
 
 #ifdef MFEM_USE_MPI
-  inline void CG(MPI_Comm comm,
-                 const Operator &A, const OccaVector &b, OccaVector &x,
-                 int print_iter = 0, int max_num_iter = 1000,
-                 double RTOLERANCE = 1e-12, double ATOLERANCE = 1e-24)
-  {
-    TCG<OccaVector>(comm,
-                    A, b, x,
-                    print_iter, max_num_iter,
-                    RTOLERANCE, ATOLERANCE);
-  }
+inline void CG(MPI_Comm comm,
+               const Operator &A, const OccaVector &b, OccaVector &x,
+               int print_iter = 0, int max_num_iter = 1000,
+               double RTOLERANCE = 1e-12, double ATOLERANCE = 1e-24)
+{
+   TCG<OccaVector>(comm,
+                   A, b, x,
+                   print_iter, max_num_iter,
+                   RTOLERANCE, ATOLERANCE);
+}
 #endif
 
-  inline void PCG(const Operator &A, Solver &B, const OccaVector &b, OccaVector &x,
-                  int print_iter = 0, int max_num_iter = 1000,
-                  double RTOLERANCE = 1e-12, double ATOLERANCE = 1e-24)
-  {
-    Solver &OccaB = *(new OccaSolverWrapper(B));
-    TPCG<OccaVector>(A, OccaB, b, x,
-                     print_iter, max_num_iter,
-                     RTOLERANCE, ATOLERANCE);
-  }
+inline void PCG(const Operator &A, Solver &B, const OccaVector &b,
+                OccaVector &x,
+                int print_iter = 0, int max_num_iter = 1000,
+                double RTOLERANCE = 1e-12, double ATOLERANCE = 1e-24)
+{
+   Solver &OccaB = *(new OccaSolverWrapper(B));
+   TPCG<OccaVector>(A, OccaB, b, x,
+                    print_iter, max_num_iter,
+                    RTOLERANCE, ATOLERANCE);
+}
 
 #ifdef MFEM_USE_MPI
-  inline void PCG(MPI_Comm comm,
-                  const Operator &A, Solver &B, const OccaVector &b, OccaVector &x,
-                  int print_iter = 0, int max_num_iter = 1000,
-                  double RTOLERANCE = 1e-12, double ATOLERANCE = 1e-24)
-  {
-    Solver &OccaB = *(new OccaSolverWrapper(B));
-    TPCG<OccaVector>(comm,
-                     A, OccaB, b, x,
-                     print_iter, max_num_iter,
-                     RTOLERANCE, ATOLERANCE);
-  }
+inline void PCG(MPI_Comm comm,
+                const Operator &A, Solver &B, const OccaVector &b, OccaVector &x,
+                int print_iter = 0, int max_num_iter = 1000,
+                double RTOLERANCE = 1e-12, double ATOLERANCE = 1e-24)
+{
+   Solver &OccaB = *(new OccaSolverWrapper(B));
+   TPCG<OccaVector>(comm,
+                    A, OccaB, b, x,
+                    print_iter, max_num_iter,
+                    RTOLERANCE, ATOLERANCE);
+}
 #endif
 }
 

@@ -213,7 +213,7 @@ public:
 
       for (int k = 0; k < num_elem; k++)
       {
-        kernel_t::MultAssembled(k, assembled_data[el+k], R);
+         kernel_t::MultAssembled(k, assembled_data[el+k], R);
       }
 
       solFEval.template Assemble<true>(R);

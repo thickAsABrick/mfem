@@ -19,14 +19,15 @@
 #include "../linalg/vector.hpp"
 #include "../linalg/operator.hpp"
 
-namespace mfem {
-  Vector& GetOccaHostVector(const int id, const int64_t size = -1);
+namespace mfem
+{
+Vector& GetOccaHostVector(const int id, const int64_t size = -1);
 
-  void OccaMult(const Operator &op,
-                const OccaVector &x, OccaVector &y);
+void OccaMult(const Operator &op,
+              const OccaVector &x, OccaVector &y);
 
-  void OccaMultTranspose(const Operator &op,
-                         const OccaVector &x, OccaVector &y);
+void OccaMultTranspose(const Operator &op,
+                       const OccaVector &x, OccaVector &y);
 }
 
 #  endif

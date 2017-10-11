@@ -19,412 +19,480 @@
 
 #include "tfe.hpp"
 
-namespace mfem {
-  //---[ Bilinear Form ]----------------
-  OccaBilinearForm::OccaBilinearForm(OccaFiniteElementSpace *ofespace_) :
-    Operator(ofespace_->GetVSize(),
-             ofespace_->GetVSize()) {
-    occa::dbg();
-    Init(occa::getDevice(), ofespace_, ofespace_);
-  }
+namespace mfem
+{
+//---[ Bilinear Form ]----------------
+OccaBilinearForm::OccaBilinearForm(OccaFiniteElementSpace *ofespace_) :
+   Operator(ofespace_->GetVSize(),
+            ofespace_->GetVSize())
+{
+   occa::dbg();
+   Init(occa::getDevice(), ofespace_, ofespace_);
+}
 
-  OccaBilinearForm::OccaBilinearForm(occa::device device_,
-                                     OccaFiniteElementSpace *ofespace_) :
-    Operator(ofespace_->GetVSize(),
-             ofespace_->GetVSize()) {
-    occa::dbg();
+OccaBilinearForm::OccaBilinearForm(occa::device device_,
+                                   OccaFiniteElementSpace *ofespace_) :
+   Operator(ofespace_->GetVSize(),
+            ofespace_->GetVSize())
+{
+   occa::dbg();
    Init(device, ofespace_, ofespace_);
-  }
+}
 
-  OccaBilinearForm::OccaBilinearForm(OccaFiniteElementSpace *otrialFESpace_,
-                                     OccaFiniteElementSpace *otestFESpace_) :
-    Operator(otrialFESpace_->GetVSize(),
-             otestFESpace_->GetVSize()) {
-    occa::dbg();
-    Init(occa::getDevice(), otrialFESpace_, otestFESpace_);
-  }
+OccaBilinearForm::OccaBilinearForm(OccaFiniteElementSpace *otrialFESpace_,
+                                   OccaFiniteElementSpace *otestFESpace_) :
+   Operator(otrialFESpace_->GetVSize(),
+            otestFESpace_->GetVSize())
+{
+   occa::dbg();
+   Init(occa::getDevice(), otrialFESpace_, otestFESpace_);
+}
 
-  OccaBilinearForm::OccaBilinearForm(occa::device device_,
-                                     OccaFiniteElementSpace *otrialFESpace_,
-                                     OccaFiniteElementSpace *otestFESpace_) :
-    Operator(otrialFESpace_->GetVSize(),
-             otestFESpace_->GetVSize()) {
-    occa::dbg();
-    Init(device, otrialFESpace_, otestFESpace_);
-  }
+OccaBilinearForm::OccaBilinearForm(occa::device device_,
+                                   OccaFiniteElementSpace *otrialFESpace_,
+                                   OccaFiniteElementSpace *otestFESpace_) :
+   Operator(otrialFESpace_->GetVSize(),
+            otestFESpace_->GetVSize())
+{
+   occa::dbg();
+   Init(device, otrialFESpace_, otestFESpace_);
+}
 
-  void OccaBilinearForm::Init(occa::device device_,
-                              OccaFiniteElementSpace *otrialFESpace_,
-                              OccaFiniteElementSpace *otestFESpace_) {
-    occa::dbg();
-    device = device_;
+void OccaBilinearForm::Init(occa::device device_,
+                            OccaFiniteElementSpace *otrialFESpace_,
+                            OccaFiniteElementSpace *otestFESpace_)
+{
+   occa::dbg();
+   device = device_;
 
-    otrialFESpace = otrialFESpace_;
-    trialFESpace  = otrialFESpace_->GetFESpace();
+   otrialFESpace = otrialFESpace_;
+   trialFESpace  = otrialFESpace_->GetFESpace();
 
-    otestFESpace = otestFESpace_;
-    testFESpace  = otestFESpace_->GetFESpace();
+   otestFESpace = otestFESpace_;
+   testFESpace  = otestFESpace_->GetFESpace();
 
-    mesh = trialFESpace->GetMesh();
+   mesh = trialFESpace->GetMesh();
 
-    const int elements = GetNE();
+   const int elements = GetNE();
 
-    const int trialVDim = trialFESpace->GetVDim();
-    const int testVDim  = testFESpace->GetVDim();
+   const int trialVDim = trialFESpace->GetVDim();
+   const int testVDim  = testFESpace->GetVDim();
 
-    const int trialLocalDofs = otrialFESpace->GetLocalDofs();
-    const int testLocalDofs  = otestFESpace->GetLocalDofs();
+   const int trialLocalDofs = otrialFESpace->GetLocalDofs();
+   const int testLocalDofs  = otestFESpace->GetLocalDofs();
 
-    const int trialElementEntries = (trialLocalDofs * trialVDim);
-    const int testElementEntries  = (testLocalDofs * testVDim);
+   const int trialElementEntries = (trialLocalDofs * trialVDim);
+   const int testElementEntries  = (testLocalDofs * testVDim);
 
-    localX.SetSize(device, elements * trialElementEntries);
-    localY.SetSize(device, elements * testElementEntries);
+   localX.SetSize(device, elements * trialElementEntries);
+   localY.SetSize(device, elements * testElementEntries);
 
-    // First-touch policy when running with OpenMP
-    if (device.mode() == "OpenMP") {
+   // First-touch policy when running with OpenMP
+   if (device.mode() == "OpenMP")
+   {
       occa::kernel initLocalKernel = device.buildKernel("occa://mfem/fem/utils.okl",
                                                         "InitLocalVector");
 
       const uint64_t trialEntries = (elements * trialLocalDofs);
       const uint64_t testEntries  = (elements * testLocalDofs);
-      for (int v = 0; v < trialVDim; ++v) {
-        const uint64_t trialOffset = v * (elements * trialLocalDofs);
-        const uint64_t testOffset  = v * (elements * testLocalDofs);
+      for (int v = 0; v < trialVDim; ++v)
+      {
+         const uint64_t trialOffset = v * (elements * trialLocalDofs);
+         const uint64_t testOffset  = v * (elements * testLocalDofs);
 
-        initLocalKernel(elements, trialLocalDofs, localX.GetRange(trialOffset, trialEntries));
-        initLocalKernel(elements, testLocalDofs , localY.GetRange(testOffset , testEntries));
+         initLocalKernel(elements, trialLocalDofs, localX.GetRange(trialOffset,
+                                                                   trialEntries));
+         initLocalKernel(elements, testLocalDofs, localY.GetRange(testOffset,
+                                                                  testEntries));
       }
-    }
-  }
+   }
+}
 
-  occa::device OccaBilinearForm::GetDevice() {
-    return device;
-  }
+occa::device OccaBilinearForm::GetDevice()
+{
+   return device;
+}
 
-  int OccaBilinearForm::BaseGeom() const {
-    return mesh->GetElementBaseGeometry();
-  }
+int OccaBilinearForm::BaseGeom() const
+{
+   return mesh->GetElementBaseGeometry();
+}
 
-  int OccaBilinearForm::GetDim() const {
-    return mesh->Dimension();
-  }
+int OccaBilinearForm::GetDim() const
+{
+   return mesh->Dimension();
+}
 
-  int64_t OccaBilinearForm::GetNE() const {
-    return mesh->GetNE();
-  }
+int64_t OccaBilinearForm::GetNE() const
+{
+   return mesh->GetNE();
+}
 
-  Mesh& OccaBilinearForm::GetMesh() const {
-    return *mesh;
-  }
+Mesh& OccaBilinearForm::GetMesh() const
+{
+   return *mesh;
+}
 
-  OccaFiniteElementSpace& OccaBilinearForm::GetTrialOccaFESpace() const {
-    return *otrialFESpace;
-  }
+OccaFiniteElementSpace& OccaBilinearForm::GetTrialOccaFESpace() const
+{
+   return *otrialFESpace;
+}
 
-  OccaFiniteElementSpace& OccaBilinearForm::GetTestOccaFESpace() const {
-    return *otestFESpace;
-  }
+OccaFiniteElementSpace& OccaBilinearForm::GetTestOccaFESpace() const
+{
+   return *otestFESpace;
+}
 
-  FiniteElementSpace& OccaBilinearForm::GetTrialFESpace() const {
-    return *trialFESpace;
-  }
+FiniteElementSpace& OccaBilinearForm::GetTrialFESpace() const
+{
+   return *trialFESpace;
+}
 
-  FiniteElementSpace& OccaBilinearForm::GetTestFESpace() const {
-    return *testFESpace;
-  }
+FiniteElementSpace& OccaBilinearForm::GetTestFESpace() const
+{
+   return *testFESpace;
+}
 
-  int64_t OccaBilinearForm::GetTrialNDofs() const {
-    return trialFESpace->GetNDofs();
-  }
+int64_t OccaBilinearForm::GetTrialNDofs() const
+{
+   return trialFESpace->GetNDofs();
+}
 
-  int64_t OccaBilinearForm::GetTestNDofs() const {
-    return testFESpace->GetNDofs();
-  }
+int64_t OccaBilinearForm::GetTestNDofs() const
+{
+   return testFESpace->GetNDofs();
+}
 
-  int64_t OccaBilinearForm::GetTrialVDim() const {
-    return trialFESpace->GetVDim();
-  }
+int64_t OccaBilinearForm::GetTrialVDim() const
+{
+   return trialFESpace->GetVDim();
+}
 
-  int64_t OccaBilinearForm::GetTestVDim() const {
-    return testFESpace->GetVDim();
-  }
+int64_t OccaBilinearForm::GetTestVDim() const
+{
+   return testFESpace->GetVDim();
+}
 
-  const FiniteElement& OccaBilinearForm::GetTrialFE(const int i) const {
-    return *(trialFESpace->GetFE(i));
-  }
+const FiniteElement& OccaBilinearForm::GetTrialFE(const int i) const
+{
+   return *(trialFESpace->GetFE(i));
+}
 
-  const FiniteElement& OccaBilinearForm::GetTestFE(const int i) const {
-    return *(testFESpace->GetFE(i));
-  }
+const FiniteElement& OccaBilinearForm::GetTestFE(const int i) const
+{
+   return *(testFESpace->GetFE(i));
+}
 
-  // Adds new Domain Integrator.
-  void OccaBilinearForm::AddDomainIntegrator(OccaIntegrator *integrator,
-                                             const occa::properties &props) {
-    AddIntegrator(integrator, props, DomainIntegrator);
-  }
+// Adds new Domain Integrator.
+void OccaBilinearForm::AddDomainIntegrator(OccaIntegrator *integrator,
+                                           const occa::properties &props)
+{
+   AddIntegrator(integrator, props, DomainIntegrator);
+}
 
-  // Adds new Boundary Integrator.
-  void OccaBilinearForm::AddBoundaryIntegrator(OccaIntegrator *integrator,
-                                               const occa::properties &props) {
-    AddIntegrator(integrator, props, BoundaryIntegrator);
-  }
+// Adds new Boundary Integrator.
+void OccaBilinearForm::AddBoundaryIntegrator(OccaIntegrator *integrator,
+                                             const occa::properties &props)
+{
+   AddIntegrator(integrator, props, BoundaryIntegrator);
+}
 
-  // Adds new interior Face Integrator.
-  void OccaBilinearForm::AddInteriorFaceIntegrator(OccaIntegrator *integrator,
-                                                   const occa::properties &props) {
-    AddIntegrator(integrator, props, InteriorFaceIntegrator);
-  }
+// Adds new interior Face Integrator.
+void OccaBilinearForm::AddInteriorFaceIntegrator(OccaIntegrator *integrator,
+                                                 const occa::properties &props)
+{
+   AddIntegrator(integrator, props, InteriorFaceIntegrator);
+}
 
-  // Adds new boundary Face Integrator.
-  void OccaBilinearForm::AddBoundaryFaceIntegrator(OccaIntegrator *integrator,
-                                                   const occa::properties &props) {
-    AddIntegrator(integrator, props, BoundaryFaceIntegrator);
-  }
+// Adds new boundary Face Integrator.
+void OccaBilinearForm::AddBoundaryFaceIntegrator(OccaIntegrator *integrator,
+                                                 const occa::properties &props)
+{
+   AddIntegrator(integrator, props, BoundaryFaceIntegrator);
+}
 
-  // Adds Integrator based on OccaIntegratorType
-  void OccaBilinearForm::AddIntegrator(OccaIntegrator *integrator,
-                                       const occa::properties &props,
-                                       const OccaIntegratorType itype) {
-    if (integrator == NULL) {
+// Adds Integrator based on OccaIntegratorType
+void OccaBilinearForm::AddIntegrator(OccaIntegrator *integrator,
+                                     const occa::properties &props,
+                                     const OccaIntegratorType itype)
+{
+   if (integrator == NULL)
+   {
       std::stringstream error_ss;
       error_ss << "OccaBilinearForm::";
-      switch (itype) {
-      case DomainIntegrator      : error_ss << "AddDomainIntegrator";       break;
-      case BoundaryIntegrator    : error_ss << "AddBoundaryIntegrator";     break;
-      case InteriorFaceIntegrator: error_ss << "AddInteriorFaceIntegrator"; break;
-      case BoundaryFaceIntegrator: error_ss << "AddBoundaryFaceIntegrator"; break;
+      switch (itype)
+      {
+         case DomainIntegrator      : error_ss << "AddDomainIntegrator";       break;
+         case BoundaryIntegrator    : error_ss << "AddBoundaryIntegrator";     break;
+         case InteriorFaceIntegrator: error_ss << "AddInteriorFaceIntegrator"; break;
+         case BoundaryFaceIntegrator: error_ss << "AddBoundaryFaceIntegrator"; break;
       }
       error_ss << " (...):\n"
                << "  Integrator is NULL";
       const std::string error = error_ss.str();
       mfem_error(error.c_str());
-    }
-    integrator->SetupIntegrator(*this, baseKernelProps + props, itype);
-    integrators.push_back(integrator);
-  }
+   }
+   integrator->SetupIntegrator(*this, baseKernelProps + props, itype);
+   integrators.push_back(integrator);
+}
 
-  const Operator* OccaBilinearForm::GetTrialProlongation() const {
-    return otrialFESpace->GetProlongationOperator();
-  }
+const Operator* OccaBilinearForm::GetTrialProlongation() const
+{
+   return otrialFESpace->GetProlongationOperator();
+}
 
-  const Operator* OccaBilinearForm::GetTestProlongation() const {
-    return otestFESpace->GetProlongationOperator();
-  }
+const Operator* OccaBilinearForm::GetTestProlongation() const
+{
+   return otestFESpace->GetProlongationOperator();
+}
 
-  const Operator* OccaBilinearForm::GetTrialRestriction() const {
-    return otrialFESpace->GetRestrictionOperator();
-  }
+const Operator* OccaBilinearForm::GetTrialRestriction() const
+{
+   return otrialFESpace->GetRestrictionOperator();
+}
 
-  const Operator* OccaBilinearForm::GetTestRestriction() const {
-    return otestFESpace->GetRestrictionOperator();
-  }
+const Operator* OccaBilinearForm::GetTestRestriction() const
+{
+   return otestFESpace->GetRestrictionOperator();
+}
 
-  //
-  void OccaBilinearForm::Assemble() {
-    // [MISSING] Find geometric information that is needed by intergrators
-    //             to share between integrators.
-    const int integratorCount = (int) integrators.size();
-    for (int i = 0; i < integratorCount; ++i) {
+//
+void OccaBilinearForm::Assemble()
+{
+   // [MISSING] Find geometric information that is needed by intergrators
+   //             to share between integrators.
+   const int integratorCount = (int) integrators.size();
+   for (int i = 0; i < integratorCount; ++i)
+   {
       integrators[i]->Assemble();
-    }
-  }
+   }
+}
 
-  void OccaBilinearForm::FormLinearSystem(const Array<int> &constraintList,
-                                          OccaVector &x, OccaVector &b,
-                                          Operator *&Aout,
-                                          OccaVector &X, OccaVector &B,
-                                          int copy_interior) {
-    FormOperator(constraintList, Aout);
-    InitRHS(constraintList, x, b, Aout, X, B, copy_interior);
-  }
+void OccaBilinearForm::FormLinearSystem(const Array<int> &constraintList,
+                                        OccaVector &x, OccaVector &b,
+                                        Operator *&Aout,
+                                        OccaVector &X, OccaVector &B,
+                                        int copy_interior)
+{
+   FormOperator(constraintList, Aout);
+   InitRHS(constraintList, x, b, Aout, X, B, copy_interior);
+}
 
-  void OccaBilinearForm::FormOperator(const Array<int> &constraintList,
-                                      Operator *&Aout) {
-    const Operator *trialP = GetTrialProlongation();
-    const Operator *testP  = GetTestProlongation();
-    Operator *rap = this;
+void OccaBilinearForm::FormOperator(const Array<int> &constraintList,
+                                    Operator *&Aout)
+{
+   const Operator *trialP = GetTrialProlongation();
+   const Operator *testP  = GetTestProlongation();
+   Operator *rap = this;
 
-    if (trialP) {
+   if (trialP)
+   {
       rap = new OccaRAPOperator(*testP, *this, *trialP);
-    }
+   }
 
-    Aout = new OccaConstrainedOperator(device,
-                                       rap, constraintList,
-                                       rap != this);
-  }
+   Aout = new OccaConstrainedOperator(device,
+                                      rap, constraintList,
+                                      rap != this);
+}
 
-  void OccaBilinearForm::InitRHS(const Array<int> &constraintList,
-                                 OccaVector &x, OccaVector &b,
-                                 Operator *A,
-                                 OccaVector &X, OccaVector &B,
-                                 int copy_interior) {
-    occa::dbg();
-    const Operator *P = GetTrialProlongation();
-    const Operator *R = GetTrialRestriction();
+void OccaBilinearForm::InitRHS(const Array<int> &constraintList,
+                               OccaVector &x, OccaVector &b,
+                               Operator *A,
+                               OccaVector &X, OccaVector &B,
+                               int copy_interior)
+{
+   occa::dbg();
+   const Operator *P = GetTrialProlongation();
+   const Operator *R = GetTrialRestriction();
 
-    if (P) {
+   if (P)
+   {
       // Variational restriction with P
       B.SetSize(device, P->Width());
       P->MultTranspose(b, B);
       X.SetSize(device, R->Height());
       R->Mult(x, X);
-    } else {
+   }
+   else
+   {
       // rap, X and B point to the same data as this, x and b
       X.NewDataAndSize(x.GetData(), x.Size());
       B.NewDataAndSize(b.GetData(), b.Size());
-    }
+   }
 
-    if (!copy_interior) {
+   if (!copy_interior)
+   {
       X.SetSubVectorComplement(constraintList, 0.0);
-    }
+   }
 
-    OccaConstrainedOperator *cA = static_cast<OccaConstrainedOperator*>(A);
-    if (cA) {
+   OccaConstrainedOperator *cA = static_cast<OccaConstrainedOperator*>(A);
+   if (cA)
+   {
       cA->EliminateRHS(X, B);
-    } else {
+   }
+   else
+   {
       mfem_error("OccaBilinearForm::InitRHS expects an OccaConstrainedOperator");
-    }
-  }
+   }
+}
 
-  // Matrix vector multiplication.
-  void OccaBilinearForm::Mult(const OccaVector &x, OccaVector &y) const {
-    occa::dbg();
-    otrialFESpace->GlobalToLocal(x, localX);
-    localY = 0;
+// Matrix vector multiplication.
+void OccaBilinearForm::Mult(const OccaVector &x, OccaVector &y) const
+{
+   occa::dbg();
+   otrialFESpace->GlobalToLocal(x, localX);
+   localY = 0;
 
-    const int integratorCount = (int) integrators.size();
-    for (int i = 0; i < integratorCount; ++i) {
+   const int integratorCount = (int) integrators.size();
+   for (int i = 0; i < integratorCount; ++i)
+   {
       integrators[i]->MultAdd(localX, localY);
-    }
+   }
 
-    otestFESpace->LocalToGlobal(localY, y);
-  }
+   otestFESpace->LocalToGlobal(localY, y);
+}
 
-  // Matrix transpose vector multiplication.
-  void OccaBilinearForm::MultTranspose(const OccaVector &x, OccaVector &y) const {
-    occa::dbg();
-    otestFESpace->GlobalToLocal(x, localX);
-    localY = 0;
+// Matrix transpose vector multiplication.
+void OccaBilinearForm::MultTranspose(const OccaVector &x, OccaVector &y) const
+{
+   occa::dbg();
+   otestFESpace->GlobalToLocal(x, localX);
+   localY = 0;
 
-    const int integratorCount = (int) integrators.size();
-    for (int i = 0; i < integratorCount; ++i) {
+   const int integratorCount = (int) integrators.size();
+   for (int i = 0; i < integratorCount; ++i)
+   {
       integrators[i]->MultTransposeAdd(localX, localY);
-    }
+   }
 
-    otrialFESpace->LocalToGlobal(localY, y);
-  }
+   otrialFESpace->LocalToGlobal(localY, y);
+}
 
 
-  void OccaBilinearForm::RecoverFEMSolution(const OccaVector &X,
-                                            const OccaVector &b,
-                                            OccaVector &x) {
-    TRecoverFEMSolution<OccaVector>(X, b, x);
-  }
+void OccaBilinearForm::RecoverFEMSolution(const OccaVector &X,
+                                          const OccaVector &b,
+                                          OccaVector &x)
+{
+   TRecoverFEMSolution<OccaVector>(X, b, x);
+}
 
-  // Frees memory bilinear form.
-  OccaBilinearForm::~OccaBilinearForm() {
-    // Make sure all integrators free their data
-    IntegratorVector::iterator it = integrators.begin();
-    while (it != integrators.end()) {
+// Frees memory bilinear form.
+OccaBilinearForm::~OccaBilinearForm()
+{
+   // Make sure all integrators free their data
+   IntegratorVector::iterator it = integrators.begin();
+   while (it != integrators.end())
+   {
       delete *it;
       ++it;
-    }
-  }
-  //====================================
+   }
+}
+//====================================
 
-  //---[ Constrained Operator ]---------
-  occa::kernelBuilder OccaConstrainedOperator::mapDofBuilder =
-                  makeCustomBuilder("vector_map_dofs",
-                                    "const int idx = v2[i];"
-                                    "v0[idx] = v1[idx];",
-                                    "defines: { VTYPE2: 'int' }");
+//---[ Constrained Operator ]---------
+occa::kernelBuilder OccaConstrainedOperator::mapDofBuilder =
+   makeCustomBuilder("vector_map_dofs",
+                     "const int idx = v2[i];"
+                     "v0[idx] = v1[idx];",
+                     "defines: { VTYPE2: 'int' }");
 
-  occa::kernelBuilder OccaConstrainedOperator::clearDofBuilder =
-                  makeCustomBuilder("vector_clear_dofs",
-                                    "v0[v1[i]] = 0.0;",
-                                    "defines: { VTYPE1: 'int' }");
+occa::kernelBuilder OccaConstrainedOperator::clearDofBuilder =
+   makeCustomBuilder("vector_clear_dofs",
+                     "v0[v1[i]] = 0.0;",
+                     "defines: { VTYPE1: 'int' }");
 
-  OccaConstrainedOperator::OccaConstrainedOperator(Operator *A_,
-                                                   const Array<int> &constraintList_,
-                                                   bool own_A_) :
-    Operator(A_->Height(), A_->Width()) {
-    occa::dbg();
-    Setup(occa::getDevice(), A_, constraintList_, own_A_);
-  }
+OccaConstrainedOperator::OccaConstrainedOperator(Operator *A_,
+                                                 const Array<int> &constraintList_,
+                                                 bool own_A_) :
+   Operator(A_->Height(), A_->Width())
+{
+   occa::dbg();
+   Setup(occa::getDevice(), A_, constraintList_, own_A_);
+}
 
-  OccaConstrainedOperator::OccaConstrainedOperator(occa::device device_,
-                                                   Operator *A_,
-                                                   const Array<int> &constraintList_,
-                                                   bool own_A_) :
-    Operator(A_->Height(), A_->Width()) {
-    occa::dbg();
-    Setup(device_, A_, constraintList_, own_A_);
-  }
+OccaConstrainedOperator::OccaConstrainedOperator(occa::device device_,
+                                                 Operator *A_,
+                                                 const Array<int> &constraintList_,
+                                                 bool own_A_) :
+   Operator(A_->Height(), A_->Width())
+{
+   occa::dbg();
+   Setup(device_, A_, constraintList_, own_A_);
+}
 
-  void OccaConstrainedOperator::Setup(occa::device device_,
-                                      Operator *A_,
-                                      const Array<int> &constraintList_,
-                                      bool own_A_) {
-    device = device_;
+void OccaConstrainedOperator::Setup(occa::device device_,
+                                    Operator *A_,
+                                    const Array<int> &constraintList_,
+                                    bool own_A_)
+{
+   device = device_;
 
-    A = A_;
-    own_A = own_A_;
+   A = A_;
+   own_A = own_A_;
 
-    constraintIndices = constraintList_.Size();
-    if (constraintIndices) {
+   constraintIndices = constraintList_.Size();
+   if (constraintIndices)
+   {
       constraintList.allocate(device,
                               constraintIndices,
                               constraintList_.GetData());
       constraintList.keepInDevice();
-    }
+   }
 
-    z.SetSize(device, height);
-    w.SetSize(device, height);
-  }
+   z.SetSize(device, height);
+   w.SetSize(device, height);
+}
 
-  void OccaConstrainedOperator::EliminateRHS(const OccaVector &x, OccaVector &b) const {
-    occa::kernel mapDofs = mapDofBuilder.build(device);
+void OccaConstrainedOperator::EliminateRHS(const OccaVector &x,
+                                           OccaVector &b) const
+{
+   occa::kernel mapDofs = mapDofBuilder.build(device);
 
-    w = 0.0;
+   w = 0.0;
 
-    if (constraintIndices) {
+   if (constraintIndices)
+   {
       mapDofs(constraintIndices, w, x, constraintList);
-    }
+   }
 
-    A->Mult(w, z);
+   A->Mult(w, z);
 
-    b -= z;
+   b -= z;
 
-    if (constraintIndices) {
+   if (constraintIndices)
+   {
       mapDofs(constraintIndices, b, x, constraintList);
-    }
-  }
+   }
+}
 
-  void OccaConstrainedOperator::Mult(const OccaVector &x, OccaVector &y) const {
-    if (constraintIndices == 0) {
+void OccaConstrainedOperator::Mult(const OccaVector &x, OccaVector &y) const
+{
+   if (constraintIndices == 0)
+   {
       A->Mult(x, y);
       return;
-    }
+   }
 
-    occa::kernel mapDofs   = mapDofBuilder.build(device);
-    occa::kernel clearDofs = clearDofBuilder.build(device);
+   occa::kernel mapDofs   = mapDofBuilder.build(device);
+   occa::kernel clearDofs = clearDofBuilder.build(device);
 
-    z = x;
+   z = x;
 
-    clearDofs(constraintIndices, z, constraintList);
+   clearDofs(constraintIndices, z, constraintList);
 
-    A->Mult(z, y);
+   A->Mult(z, y);
 
-    mapDofs(constraintIndices, y, x, constraintList);
-  }
+   mapDofs(constraintIndices, y, x, constraintList);
+}
 
-  OccaConstrainedOperator::~OccaConstrainedOperator() {
-    if (own_A) {
+OccaConstrainedOperator::~OccaConstrainedOperator()
+{
+   if (own_A)
+   {
       delete A;
-    }
-  }
-  //====================================
+   }
+}
+//====================================
 }
 
 #endif

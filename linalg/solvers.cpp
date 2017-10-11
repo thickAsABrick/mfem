@@ -79,7 +79,7 @@ void IterativeSolver::SetPreconditioner(Solver &pr)
 #ifdef MFEM_USE_OCCA
 void IterativeSolver::SetOccaPreconditioner(Solver &pr)
 {
-  SetPreconditioner(*(new OccaSolverWrapper(pr)));
+   SetPreconditioner(*(new OccaSolverWrapper(pr)));
 }
 #endif
 

@@ -50,14 +50,16 @@ public:
    inline int NumCols() const { return width; }
 
    /// Operator application: `y=A(x)`.
-   virtual void Mult(const Vector &x, Vector &y) const {
-    mfem_error("Operator::Mult(Vector) is not overloaded!");
-  }
+   virtual void Mult(const Vector &x, Vector &y) const
+   {
+      mfem_error("Operator::Mult(Vector) is not overloaded!");
+   }
 
 #if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
-  inline virtual void Mult(const OccaVector &x, OccaVector &y) const {
-    mfem_error("Operator::Mult(OccaVector) is not overloaded!");
-  }
+   inline virtual void Mult(const OccaVector &x, OccaVector &y) const
+   {
+      mfem_error("Operator::Mult(OccaVector) is not overloaded!");
+   }
 #endif
 
    /** @brief Action of the transpose operator: `y=A^t(x)`. The default behavior
@@ -373,7 +375,7 @@ private:
 
 public:
    /// Construct the RAP operator given R^T, A and P.
-  TRAPOperator(const Operator &Rt_, const Operator &A_, const Operator &P_)
+   TRAPOperator(const Operator &Rt_, const Operator &A_, const Operator &P_)
       : Operator(Rt_.Width(), P_.Width()), Rt(Rt_), A(A_), P(P_),
         Px(P.Height()), APx(A.Height()) { }
 
@@ -475,16 +477,17 @@ public:
 };
 
 template <class TVector>
-void Operator::TRecoverFEMSolution(const TVector &X, const TVector &b, TVector &x)
+void Operator::TRecoverFEMSolution(const TVector &X, const TVector &b,
+                                   TVector &x)
 {
-  const Operator *P = this->GetProlongation();
-  if (P)
-  {
-    // Apply conforming prolongation
-    x.SetSize(P->Height());
-    P->Mult(X, x);
-  }
-  // Otherwise X and x point to the same data
+   const Operator *P = this->GetProlongation();
+   if (P)
+   {
+      // Apply conforming prolongation
+      x.SetSize(P->Height());
+      P->Mult(X, x);
+   }
+   // Otherwise X and x point to the same data
 }
 
 }

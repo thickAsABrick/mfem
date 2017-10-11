@@ -15,33 +15,37 @@
 
 #include "abilinearinteg.hpp"
 
-namespace mfem {
+namespace mfem
+{
 
-class AcroDiffusionIntegrator : public AcroIntegrator {
+class AcroDiffusionIntegrator : public AcroIntegrator
+{
 private:
-  OccaCoefficient Q;
-  Array<acro::Tensor*> Btil; //Btilde used to compute stiffness matrix
-  acro::Tensor D;            //Product of integration weight, physical consts, and element shape info
-  acro::Tensor S;            //The assembled local stiffness matrices
-  acro::Tensor U, Z, T1, T2; //Intermediate computations for tensor product partial assembly
+   OccaCoefficient Q;
+   Array<acro::Tensor*> Btil; //Btilde used to compute stiffness matrix
+   acro::Tensor
+   D;            //Product of integration weight, physical consts, and element shape info
+   acro::Tensor S;            //The assembled local stiffness matrices
+   acro::Tensor U, Z, T1,
+        T2; //Intermediate computations for tensor product partial assembly
 
-  void ComputeBTilde();
+   void ComputeBTilde();
 
 public:
-  AcroDiffusionIntegrator(const OccaCoefficient &q);
-  virtual ~AcroDiffusionIntegrator();
+   AcroDiffusionIntegrator(const OccaCoefficient &q);
+   virtual ~AcroDiffusionIntegrator();
 
-  virtual OccaIntegrator* CreateInstance();
+   virtual OccaIntegrator* CreateInstance();
 
-  virtual std::string GetName();
+   virtual std::string GetName();
 
-  virtual void SetupIntegrationRule();
+   virtual void SetupIntegrationRule();
 
-  virtual void Setup();
+   virtual void Setup();
 
-  virtual void Assemble();
-  virtual void AssembleMatrix();
-  virtual void MultAdd(OccaVector &x, OccaVector &y);
+   virtual void Assemble();
+   virtual void AssembleMatrix();
+   virtual void MultAdd(OccaVector &x, OccaVector &y);
 };
 
 }

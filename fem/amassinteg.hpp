@@ -15,30 +15,34 @@
 
 #include "abilinearinteg.hpp"
 
-namespace mfem {
+namespace mfem
+{
 
-class AcroMassIntegrator : public AcroIntegrator {
+class AcroMassIntegrator : public AcroIntegrator
+{
 private:
-  OccaCoefficient Q;
-  acro::Tensor D;            //Product of integration weight, physical consts, and element shape info
-  acro::Tensor M;            //The assembled local mass matrices
-  acro::Tensor T1, T2, T3;   //Intermediate computations for tensor product partial assembly
+   OccaCoefficient Q;
+   acro::Tensor
+   D;            //Product of integration weight, physical consts, and element shape info
+   acro::Tensor M;            //The assembled local mass matrices
+   acro::Tensor T1, T2,
+        T3;   //Intermediate computations for tensor product partial assembly
 
 public:
-  AcroMassIntegrator(const OccaCoefficient &q);
-  virtual ~AcroMassIntegrator();
+   AcroMassIntegrator(const OccaCoefficient &q);
+   virtual ~AcroMassIntegrator();
 
-  virtual OccaIntegrator* CreateInstance();
+   virtual OccaIntegrator* CreateInstance();
 
-  virtual std::string GetName();
+   virtual std::string GetName();
 
-  virtual void SetupIntegrationRule();
+   virtual void SetupIntegrationRule();
 
-  virtual void Setup();
+   virtual void Setup();
 
-  virtual void Assemble();
-  virtual void AssembleMatrix();
-  virtual void MultAdd(OccaVector &x, OccaVector &y);
+   virtual void Assemble();
+   virtual void AssembleMatrix();
+   virtual void MultAdd(OccaVector &x, OccaVector &y);
 };
 
 }

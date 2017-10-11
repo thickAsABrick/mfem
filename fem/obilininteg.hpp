@@ -18,284 +18,291 @@
 #include "obilinearform.hpp"
 #include "ocoefficient.hpp"
 
-namespace mfem {
-  class OccaGeometry {
-  public:
-    occa::array<double> meshNodes;
-    occa::array<double> J, invJ, detJ;
+namespace mfem
+{
+class OccaGeometry
+{
+public:
+   occa::array<double> meshNodes;
+   occa::array<double> J, invJ, detJ;
 
-    // byVDIM  -> [x y z x y z x y z]
-    // byNodes -> [x x x y y y z z z]
-    static const int Jacobian    = (1 << 0);
-    static const int JacobianInv = (1 << 1);
-    static const int JacobianDet = (1 << 2);
+   // byVDIM  -> [x y z x y z x y z]
+   // byNodes -> [x x x y y y z z z]
+   static const int Jacobian    = (1 << 0);
+   static const int JacobianInv = (1 << 1);
+   static const int JacobianDet = (1 << 2);
 
-    static OccaGeometry Get(occa::device device,
-                            OccaFiniteElementSpace &ofespace,
-                            const IntegrationRule &ir,
-                            const int flags = (Jacobian    |
-                                               JacobianInv |
-                                               JacobianDet));
-  };
+   static OccaGeometry Get(occa::device device,
+                           OccaFiniteElementSpace &ofespace,
+                           const IntegrationRule &ir,
+                           const int flags = (Jacobian    |
+                                              JacobianInv |
+                                              JacobianDet));
+};
 
-  class OccaDofQuadMaps {
-  private:
-    // Reuse dof-quad maps
-    static std::map<std::string, OccaDofQuadMaps> AllDofQuadMaps;
-    std::string hash;
+class OccaDofQuadMaps
+{
+private:
+   // Reuse dof-quad maps
+   static std::map<std::string, OccaDofQuadMaps> AllDofQuadMaps;
+   std::string hash;
 
-  public:
-    // Local stiffness matrices (B and B^T operators)
-    occa::array<double, occa::dynamic> dofToQuad, dofToQuadD; // B
-    occa::array<double, occa::dynamic> quadToDof, quadToDofD; // B^T
-    occa::array<double> quadWeights;
+public:
+   // Local stiffness matrices (B and B^T operators)
+   occa::array<double, occa::dynamic> dofToQuad, dofToQuadD; // B
+   occa::array<double, occa::dynamic> quadToDof, quadToDofD; // B^T
+   occa::array<double> quadWeights;
 
-    OccaDofQuadMaps();
-    OccaDofQuadMaps(const OccaDofQuadMaps &maps);
-    OccaDofQuadMaps& operator = (const OccaDofQuadMaps &maps);
+   OccaDofQuadMaps();
+   OccaDofQuadMaps(const OccaDofQuadMaps &maps);
+   OccaDofQuadMaps& operator = (const OccaDofQuadMaps &maps);
 
-    // [[x y] [x y] [x y]]
-    // [[x y z] [x y z] [x y z]]
-    // GridFunction* Mesh::GetNodes() { return Nodes; }
+   // [[x y] [x y] [x y]]
+   // [[x y z] [x y z] [x y z]]
+   // GridFunction* Mesh::GetNodes() { return Nodes; }
 
-    // FiniteElementSpace *Nodes->FESpace()
-    // 25
-    // 1D [x x x x x x]
-    // 2D [x y x y x y]
-    // GetVdim()
-    // 3D ordering == byVDIM  -> [x y z x y z x y z x y z x y z x y z]
-    //    ordering == byNODES -> [x x x x x x y y y y y y z z z z z z]
-    static OccaDofQuadMaps& Get(occa::device device,
-                                const OccaFiniteElementSpace &fespace,
-                                const IntegrationRule &ir,
-                                const bool transpose = false);
+   // FiniteElementSpace *Nodes->FESpace()
+   // 25
+   // 1D [x x x x x x]
+   // 2D [x y x y x y]
+   // GetVdim()
+   // 3D ordering == byVDIM  -> [x y z x y z x y z x y z x y z x y z]
+   //    ordering == byNODES -> [x x x x x x y y y y y y z z z z z z]
+   static OccaDofQuadMaps& Get(occa::device device,
+                               const OccaFiniteElementSpace &fespace,
+                               const IntegrationRule &ir,
+                               const bool transpose = false);
 
-    static OccaDofQuadMaps& Get(occa::device device,
-                                const FiniteElement &fe,
-                                const IntegrationRule &ir,
-                                const bool transpose = false);
+   static OccaDofQuadMaps& Get(occa::device device,
+                               const FiniteElement &fe,
+                               const IntegrationRule &ir,
+                               const bool transpose = false);
 
-    static OccaDofQuadMaps& Get(occa::device device,
-                                const OccaFiniteElementSpace &trialFESpace,
-                                const OccaFiniteElementSpace &testFESpace,
-                                const IntegrationRule &ir,
-                                const bool transpose = false);
+   static OccaDofQuadMaps& Get(occa::device device,
+                               const OccaFiniteElementSpace &trialFESpace,
+                               const OccaFiniteElementSpace &testFESpace,
+                               const IntegrationRule &ir,
+                               const bool transpose = false);
 
-    static OccaDofQuadMaps& Get(occa::device device,
-                                const FiniteElement &trialFE,
-                                const FiniteElement &testFE,
-                                const IntegrationRule &ir,
-                                const bool transpose = false);
+   static OccaDofQuadMaps& Get(occa::device device,
+                               const FiniteElement &trialFE,
+                               const FiniteElement &testFE,
+                               const IntegrationRule &ir,
+                               const bool transpose = false);
 
-    static OccaDofQuadMaps& GetTensorMaps(occa::device device,
+   static OccaDofQuadMaps& GetTensorMaps(occa::device device,
+                                         const FiniteElement &fe,
+                                         const IntegrationRule &ir,
+                                         const bool transpose = false);
+
+   static OccaDofQuadMaps& GetTensorMaps(occa::device device,
+                                         const FiniteElement &trialFE,
+                                         const FiniteElement &testFE,
+                                         const IntegrationRule &ir,
+                                         const bool transpose = false);
+
+   static OccaDofQuadMaps GetD2QTensorMaps(occa::device device,
+                                           const FiniteElement &fe,
+                                           const IntegrationRule &ir,
+                                           const bool transpose = false);
+
+   static OccaDofQuadMaps& GetSimplexMaps(occa::device device,
                                           const FiniteElement &fe,
                                           const IntegrationRule &ir,
                                           const bool transpose = false);
 
-    static OccaDofQuadMaps& GetTensorMaps(occa::device device,
+   static OccaDofQuadMaps& GetSimplexMaps(occa::device device,
                                           const FiniteElement &trialFE,
                                           const FiniteElement &testFE,
                                           const IntegrationRule &ir,
                                           const bool transpose = false);
 
-    static OccaDofQuadMaps GetD2QTensorMaps(occa::device device,
+   static OccaDofQuadMaps GetD2QSimplexMaps(occa::device device,
                                             const FiniteElement &fe,
                                             const IntegrationRule &ir,
                                             const bool transpose = false);
+};
 
-    static OccaDofQuadMaps& GetSimplexMaps(occa::device device,
-                                           const FiniteElement &fe,
-                                           const IntegrationRule &ir,
-                                           const bool transpose = false);
+//---[ Define Methods ]---------------
+std::string stringWithDim(const std::string &s, const int dim);
+int closestWarpBatch(const int multiple, const int maxSize);
 
-    static OccaDofQuadMaps& GetSimplexMaps(occa::device device,
-                                           const FiniteElement &trialFE,
-                                           const FiniteElement &testFE,
-                                           const IntegrationRule &ir,
-                                           const bool transpose = false);
+void SetProperties(OccaFiniteElementSpace &fespace,
+                   const IntegrationRule &ir,
+                   occa::properties &props);
 
-    static OccaDofQuadMaps GetD2QSimplexMaps(occa::device device,
-                                             const FiniteElement &fe,
-                                             const IntegrationRule &ir,
-                                             const bool transpose = false);
-  };
+void SetProperties(OccaFiniteElementSpace &trialFESpace,
+                   OccaFiniteElementSpace &testFESpace,
+                   const IntegrationRule &ir,
+                   occa::properties &props);
 
-  //---[ Define Methods ]---------------
-  std::string stringWithDim(const std::string &s, const int dim);
-  int closestWarpBatch(const int multiple, const int maxSize);
+void SetTensorProperties(OccaFiniteElementSpace &fespace,
+                         const IntegrationRule &ir,
+                         occa::properties &props);
 
-  void SetProperties(OccaFiniteElementSpace &fespace,
-                     const IntegrationRule &ir,
-                     occa::properties &props);
+void SetTensorProperties(OccaFiniteElementSpace &trialFESpace,
+                         OccaFiniteElementSpace &testFESpace,
+                         const IntegrationRule &ir,
+                         occa::properties &props);
 
-  void SetProperties(OccaFiniteElementSpace &trialFESpace,
-                     OccaFiniteElementSpace &testFESpace,
-                     const IntegrationRule &ir,
-                     occa::properties &props);
+void SetSimplexProperties(OccaFiniteElementSpace &fespace,
+                          const IntegrationRule &ir,
+                          occa::properties &props);
 
-  void SetTensorProperties(OccaFiniteElementSpace &fespace,
-                           const IntegrationRule &ir,
-                           occa::properties &props);
+void SetSimplexProperties(OccaFiniteElementSpace &trialFESpace,
+                          OccaFiniteElementSpace &testFESpace,
+                          const IntegrationRule &ir,
+                          occa::properties &props);
 
-  void SetTensorProperties(OccaFiniteElementSpace &trialFESpace,
-                           OccaFiniteElementSpace &testFESpace,
-                           const IntegrationRule &ir,
-                           occa::properties &props);
+//---[ Base Integrator ]--------------
+class OccaIntegrator
+{
+protected:
+   occa::device device;
 
-  void SetSimplexProperties(OccaFiniteElementSpace &fespace,
-                            const IntegrationRule &ir,
-                            occa::properties &props);
+   OccaBilinearForm *bform;
+   Mesh *mesh;
 
-  void SetSimplexProperties(OccaFiniteElementSpace &trialFESpace,
-                            OccaFiniteElementSpace &testFESpace,
-                            const IntegrationRule &ir,
-                            occa::properties &props);
+   OccaFiniteElementSpace *otrialFESpace;
+   OccaFiniteElementSpace *otestFESpace;
 
-  //---[ Base Integrator ]--------------
-  class OccaIntegrator {
-  protected:
-    occa::device device;
+   FiniteElementSpace *trialFESpace;
+   FiniteElementSpace *testFESpace;
 
-    OccaBilinearForm *bform;
-    Mesh *mesh;
+   occa::properties props;
+   OccaIntegratorType itype;
 
-    OccaFiniteElementSpace *otrialFESpace;
-    OccaFiniteElementSpace *otestFESpace;
+   const IntegrationRule *ir;
+   bool hasTensorBasis;
+   OccaDofQuadMaps maps;
+   OccaDofQuadMaps mapsTranspose;
 
-    FiniteElementSpace *trialFESpace;
-    FiniteElementSpace *testFESpace;
+public:
+   OccaIntegrator();
+   virtual ~OccaIntegrator();
 
-    occa::properties props;
-    OccaIntegratorType itype;
+   occa::device GetDevice();
 
-    const IntegrationRule *ir;
-    bool hasTensorBasis;
-    OccaDofQuadMaps maps;
-    OccaDofQuadMaps mapsTranspose;
+   virtual std::string GetName() = 0;
 
-  public:
-    OccaIntegrator();
-    virtual ~OccaIntegrator();
+   OccaFiniteElementSpace& GetTrialOccaFESpace() const;
+   OccaFiniteElementSpace& GetTestOccaFESpace() const;
 
-    occa::device GetDevice();
+   FiniteElementSpace& GetTrialFESpace() const;
+   FiniteElementSpace& GetTestFESpace() const;
 
-    virtual std::string GetName() = 0;
+   void SetIntegrationRule(const IntegrationRule &ir_);
+   const IntegrationRule& GetIntegrationRule() const;
 
-    OccaFiniteElementSpace& GetTrialOccaFESpace() const;
-    OccaFiniteElementSpace& GetTestOccaFESpace() const;
+   OccaDofQuadMaps& GetDofQuadMaps();
 
-    FiniteElementSpace& GetTrialFESpace() const;
-    FiniteElementSpace& GetTestFESpace() const;
+   void SetupMaps();
 
-    void SetIntegrationRule(const IntegrationRule &ir_);
-    const IntegrationRule& GetIntegrationRule() const;
+   virtual void SetupIntegrationRule() = 0;
 
-    OccaDofQuadMaps& GetDofQuadMaps();
+   virtual void SetupIntegrator(OccaBilinearForm &bform_,
+                                const occa::properties &props_,
+                                const OccaIntegratorType itype_);
 
-    void SetupMaps();
+   virtual void Setup() = 0;
 
-    virtual void SetupIntegrationRule() = 0;
+   virtual void Assemble() = 0;
+   virtual void MultAdd(OccaVector &x, OccaVector &y) = 0;
 
-    virtual void SetupIntegrator(OccaBilinearForm &bform_,
-                                 const occa::properties &props_,
-                                 const OccaIntegratorType itype_);
+   virtual void MultTransposeAdd(OccaVector &x, OccaVector &y)
+   {
+      mfem_error("OccaIntegrator::MultTransposeAdd() is not overloaded!");
+   }
 
-    virtual void Setup() = 0;
+   OccaGeometry GetGeometry(const int flags = (OccaGeometry::Jacobian    |
+                                               OccaGeometry::JacobianInv |
+                                               OccaGeometry::JacobianDet));
 
-    virtual void Assemble() = 0;
-    virtual void MultAdd(OccaVector &x, OccaVector &y) = 0;
+   occa::kernel GetAssembleKernel(const occa::properties &props);
+   occa::kernel GetMultAddKernel(const occa::properties &props);
 
-    virtual void MultTransposeAdd(OccaVector &x, OccaVector &y)
-    {
-       mfem_error("OccaIntegrator::MultTransposeAdd() is not overloaded!");
-    }
+   occa::kernel GetKernel(const std::string &kernelName,
+                          const occa::properties &props);
+};
+//====================================
 
-    OccaGeometry GetGeometry(const int flags = (OccaGeometry::Jacobian    |
-                                                OccaGeometry::JacobianInv |
-                                                OccaGeometry::JacobianDet));
+//---[ Diffusion Integrator ]---------
+class OccaDiffusionIntegrator : public OccaIntegrator
+{
+private:
+   OccaCoefficient coeff;
 
-    occa::kernel GetAssembleKernel(const occa::properties &props);
-    occa::kernel GetMultAddKernel(const occa::properties &props);
+   occa::kernel assembleKernel, multKernel;
 
-    occa::kernel GetKernel(const std::string &kernelName,
-                           const occa::properties &props);
-  };
-  //====================================
+   OccaVector assembledOperator;
 
-  //---[ Diffusion Integrator ]---------
-  class OccaDiffusionIntegrator : public OccaIntegrator {
-  private:
-    OccaCoefficient coeff;
+public:
+   OccaDiffusionIntegrator(const OccaCoefficient &coeff_ = 1.0);
+   virtual ~OccaDiffusionIntegrator();
 
-    occa::kernel assembleKernel, multKernel;
+   virtual std::string GetName();
 
-    OccaVector assembledOperator;
+   virtual void SetupIntegrationRule();
 
-  public:
-    OccaDiffusionIntegrator(const OccaCoefficient &coeff_ = 1.0);
-    virtual ~OccaDiffusionIntegrator();
+   virtual void Setup();
 
-    virtual std::string GetName();
+   virtual void Assemble();
+   virtual void MultAdd(OccaVector &x, OccaVector &y);
+};
+//====================================
 
-    virtual void SetupIntegrationRule();
+//---[ Mass Integrator ]--------------
+class OccaMassIntegrator : public OccaIntegrator
+{
+private:
+   OccaCoefficient coeff;
 
-    virtual void Setup();
+   occa::kernel assembleKernel, multKernel;
 
-    virtual void Assemble();
-    virtual void MultAdd(OccaVector &x, OccaVector &y);
-  };
-  //====================================
+   OccaVector assembledOperator;
 
-  //---[ Mass Integrator ]--------------
-  class OccaMassIntegrator : public OccaIntegrator {
-  private:
-    OccaCoefficient coeff;
+public:
+   OccaMassIntegrator(const OccaCoefficient &coeff_ = 1.0);
+   virtual ~OccaMassIntegrator();
 
-    occa::kernel assembleKernel, multKernel;
+   virtual std::string GetName();
 
-    OccaVector assembledOperator;
+   virtual void SetupIntegrationRule();
 
-  public:
-    OccaMassIntegrator(const OccaCoefficient &coeff_ = 1.0);
-    virtual ~OccaMassIntegrator();
+   virtual void Setup();
 
-    virtual std::string GetName();
+   virtual void Assemble();
+   void SetOperator(OccaVector &v);
 
-    virtual void SetupIntegrationRule();
+   virtual void MultAdd(OccaVector &x, OccaVector &y);
+};
+//====================================
 
-    virtual void Setup();
+//---[ Vector Mass Integrator ]--------------
+class OccaVectorMassIntegrator : public OccaIntegrator
+{
+private:
+   OccaCoefficient coeff;
 
-    virtual void Assemble();
-    void SetOperator(OccaVector &v);
+   occa::kernel assembleKernel, multKernel;
 
-    virtual void MultAdd(OccaVector &x, OccaVector &y);
-  };
-  //====================================
+   OccaVector assembledOperator;
 
-  //---[ Vector Mass Integrator ]--------------
-  class OccaVectorMassIntegrator : public OccaIntegrator {
-  private:
-    OccaCoefficient coeff;
+public:
+   OccaVectorMassIntegrator(const OccaCoefficient &coeff_ = 1.0);
+   virtual ~OccaVectorMassIntegrator();
 
-    occa::kernel assembleKernel, multKernel;
+   virtual std::string GetName();
 
-    OccaVector assembledOperator;
+   virtual void SetupIntegrationRule();
 
-  public:
-    OccaVectorMassIntegrator(const OccaCoefficient &coeff_ = 1.0);
-    virtual ~OccaVectorMassIntegrator();
+   virtual void Setup();
 
-    virtual std::string GetName();
+   virtual void Assemble();
 
-    virtual void SetupIntegrationRule();
-
-    virtual void Setup();
-
-    virtual void Assemble();
-
-    virtual void MultAdd(OccaVector &x, OccaVector &y);
-  };
-  //====================================
+   virtual void MultAdd(OccaVector &x, OccaVector &y);
+};
+//====================================
 }
 
 #  endif

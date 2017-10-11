@@ -52,18 +52,18 @@ protected:
    double Dot(const TVector &x, const TVector &y) const
    {
 #ifndef MFEM_USE_MPI
-     return (x * y);
+      return (x * y);
 #else
-     if (dot_prod_type == 0)
-     {
-       return (x * y);
-     }
-     double local_dot = (x * y);
-     double global_dot;
+      if (dot_prod_type == 0)
+      {
+         return (x * y);
+      }
+      double local_dot = (x * y);
+      double global_dot;
 
-     MPI_Allreduce(&local_dot, &global_dot, 1, MPI_DOUBLE, MPI_SUM, comm);
+      MPI_Allreduce(&local_dot, &global_dot, 1, MPI_DOUBLE, MPI_SUM, comm);
 
-     return global_dot;
+      return global_dot;
 #endif
    }
 
@@ -90,7 +90,7 @@ public:
    virtual void SetPreconditioner(Solver &pr);
 
 #if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
-  void SetOccaPreconditioner(Solver &pr);
+   void SetOccaPreconditioner(Solver &pr);
 #endif
 
    /// Also calls SetOperator for the preconditioner if there is one
@@ -154,14 +154,15 @@ public:
    virtual void SetOperator(const Operator &op)
    { IterativeSolver::SetOperator(op); UpdateVectors(); }
 
-   virtual void Mult(const TVector &b, TVector &x) const {
+   virtual void Mult(const TVector &b, TVector &x) const
+   {
       int i;
       double r0, den, nom, nom0, betanom, alpha, beta;
 
       if (iterative_mode)
       {
-        oper->Mult(x, r);
-        subtract(b, r, r); // r = b - A x
+         oper->Mult(x, r);
+         subtract(b, r, r); // r = b - A x
       }
       else
       {
@@ -321,7 +322,7 @@ void TCG(const Operator &A, const TVector &b, TVector &x,
    cg.Mult(b, x);
 }
 
-  #ifdef MFEM_USE_MPI
+#ifdef MFEM_USE_MPI
 /// Conjugate gradient method. (tolerances are squared)
 template <class TVector>
 void TCG(MPI_Comm comm,
@@ -363,7 +364,7 @@ void TPCG(MPI_Comm comm,
           int print_iter = 0, int max_num_iter = 1000,
           double RTOLERANCE = 1e-12, double ATOLERANCE = 1e-24)
 {
-  TCGSolver<TVector> pcg(comm);
+   TCGSolver<TVector> pcg(comm);
    pcg.SetPrintLevel(print_iter);
    pcg.SetMaxIter(max_num_iter);
    pcg.SetRelTol(sqrt(RTOLERANCE));
@@ -378,9 +379,9 @@ inline void CG(const Operator &A, const Vector &b, Vector &x,
                int print_iter = 0, int max_num_iter = 1000,
                double RTOLERANCE = 1e-12, double ATOLERANCE = 1e-24)
 {
-  TCG<Vector>(A, b, x,
-              print_iter, max_num_iter,
-              RTOLERANCE, ATOLERANCE);
+   TCG<Vector>(A, b, x,
+               print_iter, max_num_iter,
+               RTOLERANCE, ATOLERANCE);
 }
 
 #ifdef MFEM_USE_MPI
@@ -389,10 +390,10 @@ inline void CG(MPI_Comm comm,
                int print_iter = 0, int max_num_iter = 1000,
                double RTOLERANCE = 1e-12, double ATOLERANCE = 1e-24)
 {
-  TCG<Vector>(comm,
-              A, b, x,
-              print_iter, max_num_iter,
-              RTOLERANCE, ATOLERANCE);
+   TCG<Vector>(comm,
+               A, b, x,
+               print_iter, max_num_iter,
+               RTOLERANCE, ATOLERANCE);
 }
 #endif
 
@@ -400,9 +401,9 @@ inline void PCG(const Operator &A, Solver &B, const Vector &b, Vector &x,
                 int print_iter = 0, int max_num_iter = 1000,
                 double RTOLERANCE = 1e-12, double ATOLERANCE = 1e-24)
 {
-  TPCG<Vector>(A, B, b, x,
-               print_iter, max_num_iter,
-               RTOLERANCE, ATOLERANCE);
+   TPCG<Vector>(A, B, b, x,
+                print_iter, max_num_iter,
+                RTOLERANCE, ATOLERANCE);
 }
 
 #ifdef MFEM_USE_MPI
@@ -411,10 +412,10 @@ inline void PCG(MPI_Comm comm,
                 int print_iter = 0, int max_num_iter = 1000,
                 double RTOLERANCE = 1e-12, double ATOLERANCE = 1e-24)
 {
-  TPCG<Vector>(comm,
-               A, B, b, x,
-               print_iter, max_num_iter,
-               RTOLERANCE, ATOLERANCE);
+   TPCG<Vector>(comm,
+                A, B, b, x,
+                print_iter, max_num_iter,
+                RTOLERANCE, ATOLERANCE);
 }
 #endif
 
