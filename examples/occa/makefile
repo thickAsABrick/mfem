@@ -86,6 +86,7 @@ clear-mfem-kernels:
 	@echo y | occa clear -l mfem
 
 $(OCCA_LIB_CACHE_DIR)/mfem/fem/%.okl: $(MFEM_REAL_DIR)/fem/kernels/%.okl
+	@echo "Kernel:" $<
 	@echo "Caching: $(subst $(MFEM_REAL_DIR)/,,$<)"
 	@occa cache mfem/$(subst $(OCCA_LIB_CACHE_DIR)/mfem/,,$(dir $@)) $<
 

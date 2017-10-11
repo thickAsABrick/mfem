@@ -32,7 +32,7 @@
 namespace mfem
 {
 
-#ifdef MFEM_USE_OCCA
+#if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
   class OccaVector;
 #endif
 
@@ -169,7 +169,7 @@ public:
    /// Redefine '=' for vector = constant.
    Vector & operator=(double value);
 
-#ifdef MFEM_USE_OCCA
+#if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
    /// Copy data from OccaVector
    Vector & operator=(const OccaVector &ov);
 #endif

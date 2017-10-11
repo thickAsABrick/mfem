@@ -31,7 +31,7 @@ private:
    void Eigensystem(Vector &ev, DenseMatrix *evect = NULL);
 
 public:
-#ifdef MFEM_USE_OCCA
+#if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
    // Remove 'hidden overloaded virtual function' warning due
    //  to not implementing the OccaVector methods
    using Operator::Mult;
@@ -512,7 +512,7 @@ private:
    LUFactors lu;
 
 public:
-#ifdef MFEM_USE_OCCA
+#if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
    // Remove 'hidden overloaded virtual function' warning due
    //  to not implementing the OccaVector method
    using Operator::Mult;

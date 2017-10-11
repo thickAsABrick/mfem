@@ -15,7 +15,7 @@
 #include "../config/config.hpp"
 #include "vector.hpp"
 
-#ifdef MFEM_USE_OCCA
+#if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
 #include "ovector.hpp"
 #endif
 
@@ -54,7 +54,7 @@ public:
     mfem_error("Operator::Mult(Vector) is not overloaded!");
   }
 
-#ifdef MFEM_USE_OCCA
+#if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
   inline virtual void Mult(const OccaVector &x, OccaVector &y) const {
     mfem_error("Operator::Mult(OccaVector) is not overloaded!");
   }
@@ -65,7 +65,7 @@ public:
    virtual void MultTranspose(const Vector &x, Vector &y) const
    { mfem_error("Operator::MultTranspose() is not overloaded!"); }
 
-#ifdef MFEM_USE_OCCA
+#if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
    inline virtual void MultTranspose(const OccaVector &x, OccaVector &y) const
    { mfem_error("Operator::MultTranspose() is not overloaded!"); }
 #endif
@@ -227,7 +227,7 @@ public:
    {
       mfem_error("TimeDependentOperator::Mult() is not overridden!");
    }
-#ifdef MFEM_USE_OCCA
+#if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
    virtual void Mult(const OccaVector &x, OccaVector &y) const
    {
       mfem_error("TimeDependentOperator::Mult() is not overridden!");
@@ -254,7 +254,7 @@ public:
    {
       mfem_error("TimeDependentOperator::ImplicitSolve() is not overridden!");
    }
-#ifdef MFEM_USE_OCCA
+#if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
    virtual void ImplicitSolve(const double dt, const OccaVector &x, OccaVector &k)
    {
       mfem_error("TimeDependentOperator::ImplicitSolve() is not overridden!");
@@ -329,7 +329,7 @@ public:
 
 typedef TIdentityOperator<Vector> IdentityOperator;
 
-#ifdef MFEM_USE_OCCA
+#if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
 typedef TIdentityOperator<OccaVector> OccaIdentityOperator;
 #endif
 
@@ -388,7 +388,7 @@ public:
 
 typedef TRAPOperator<Vector> RAPOperator;
 
-#ifdef MFEM_USE_OCCA
+#if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
 typedef TRAPOperator<OccaVector> OccaRAPOperator;
 #endif
 

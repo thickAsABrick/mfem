@@ -73,7 +73,7 @@ public:
      virtual void Step(Vector &x, double &t, double &dt) {
         mfem_error("ODESolver::Step(Vector) is not overloaded!");
      }
-  #ifdef MFEM_USE_OCCA
+  #if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
      virtual void Step(OccaVector &x, double &t, double &dt) {
         mfem_error("ODESolver::Step(OccaVector) is not overloaded!");
      }
@@ -99,7 +99,7 @@ public:
    {
       while (t < tf) { Step(x, t, dt); }
    }
-#ifdef MFEM_USE_OCCA
+#if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
    virtual void Run(OccaVector &x, double &t, double &dt, double tf)
    {
       while (t < tf) { Step(x, t, dt); }
@@ -320,7 +320,7 @@ typedef TSDIRK23Solver<Vector>          SDIRK23Solver;
 typedef TSDIRK34Solver<Vector>          SDIRK34Solver;
 typedef TSDIRK33Solver<Vector>          SDIRK33Solver;
 
-#ifdef MFEM_USE_OCCA
+#if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
 typedef TForwardEulerSolver<OccaVector>     OccaForwardEulerSolver;
 typedef TRK2Solver<OccaVector>              OccaRK2Solver;
 typedef TRK3SSPSolver<OccaVector>           OccaRK3SSPSolver;

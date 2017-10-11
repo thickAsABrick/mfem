@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
    int order = 1;
    int ref_levels = 1;
    const char *device_info = "mode: 'Serial'";
-   bool occa_verbose = false;
+   bool occa_verbose = true;
    bool use_acrotensor = false;
    bool visualization = 1;
 

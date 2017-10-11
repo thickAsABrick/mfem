@@ -89,7 +89,7 @@ public:
    /// This should be called before SetOperator
    virtual void SetPreconditioner(Solver &pr);
 
-#ifdef MFEM_USE_OCCA
+#if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
   void SetOccaPreconditioner(Solver &pr);
 #endif
 
