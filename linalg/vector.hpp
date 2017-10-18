@@ -34,6 +34,7 @@ namespace mfem
 
 #if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
 class OccaVector;
+class Ok2cVector;
 #endif
 
 /** Count the number of entries in an array of doubles for which isfinite
@@ -172,6 +173,7 @@ public:
 #if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
    /// Copy data from OccaVector
    Vector & operator=(const OccaVector &ov);
+   Vector & operator=(const Ok2cVector &ov);
 #endif
 
    Vector & operator*=(double c);

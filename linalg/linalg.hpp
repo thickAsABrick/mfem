@@ -33,7 +33,7 @@
 #include "sundials.hpp"
 #endif
 
-#if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
+#if defined(MFEM_USE_OCCA) //|| defined(MFEM_USE_OKINA)
 #include "osolvers.hpp"
 #include "ovector.hpp"
 #include "osparsemat.hpp"

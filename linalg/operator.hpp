@@ -15,7 +15,7 @@
 #include "../config/config.hpp"
 #include "vector.hpp"
 
-#if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
+#if defined(MFEM_USE_OCCA) //|| defined(MFEM_USE_OKINA)
 #include "ovector.hpp"
 #endif
 
@@ -60,6 +60,10 @@ public:
    {
       mfem_error("Operator::Mult(OccaVector) is not overloaded!");
    }
+   inline virtual void Mult(const Ok2cVector &x, Ok2cVector &y) const
+   {
+      mfem_error("Operator::Mult(Ok2cVector) is not overloaded!");
+   }
 #endif
 
    /** @brief Action of the transpose operator: `y=A^t(x)`. The default behavior
@@ -69,6 +73,8 @@ public:
 
 #if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
    inline virtual void MultTranspose(const OccaVector &x, OccaVector &y) const
+   { mfem_error("Operator::MultTranspose() is not overloaded!"); }
+   inline virtual void MultTranspose(const Ok2cVector &x, Ok2cVector &y) const
    { mfem_error("Operator::MultTranspose() is not overloaded!"); }
 #endif
 
@@ -234,6 +240,10 @@ public:
    {
       mfem_error("TimeDependentOperator::Mult() is not overridden!");
    }
+   virtual void Mult(const Ok2cVector &x, Ok2cVector &y) const
+   {
+      mfem_error("TimeDependentOperator::Mult() is not overridden!");
+   }
 #endif
 
    /** @brief Solve the equation: @a k = f(@a x + @a dt @a k, t), for the
@@ -258,6 +268,10 @@ public:
    }
 #if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
    virtual void ImplicitSolve(const double dt, const OccaVector &x, OccaVector &k)
+   {
+      mfem_error("TimeDependentOperator::ImplicitSolve() is not overridden!");
+   }
+   virtual void ImplicitSolve(const double dt, const Ok2cVector &x, Ok2cVector &k)
    {
       mfem_error("TimeDependentOperator::ImplicitSolve() is not overridden!");
    }
@@ -333,6 +347,7 @@ typedef TIdentityOperator<Vector> IdentityOperator;
 
 #if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
 typedef TIdentityOperator<OccaVector> OccaIdentityOperator;
+typedef TIdentityOperator<Ok2cVector> Ok2cIdentityOperator;
 #endif
 
 
@@ -392,6 +407,7 @@ typedef TRAPOperator<Vector> RAPOperator;
 
 #if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
 typedef TRAPOperator<OccaVector> OccaRAPOperator;
+typedef TRAPOperator<Ok2cVector> Ok2cRAPOperator;
 #endif
 
 /// General triple product operator x -> A*B*C*x, with ownership of the factors.
