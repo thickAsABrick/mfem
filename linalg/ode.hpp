@@ -79,6 +79,10 @@ public:
    {
       mfem_error("ODESolver::Step(OccaVector) is not overloaded!");
    }
+   virtual void Step(Ok2cVector &x, double &t, double &dt)
+   {
+      mfem_error("ODESolver::Step(OccaVector) is not overloaded!");
+   }
 #endif
 
    /// Perform time integration from time @a t [in] to time @a tf [in].
@@ -103,6 +107,10 @@ public:
    }
 #if defined(MFEM_USE_OCCA) || defined(MFEM_USE_OKINA)
    virtual void Run(OccaVector &x, double &t, double &dt, double tf)
+   {
+      while (t < tf) { Step(x, t, dt); }
+   }
+   virtual void Run(Ok2cVector &x, double &t, double &dt, double tf)
    {
       while (t < tf) { Step(x, t, dt); }
    }
@@ -335,6 +343,19 @@ typedef TImplicitMidpointSolver<OccaVector> OccaImplicitMidpointSolver;
 typedef TSDIRK23Solver<OccaVector>          OccaSDIRK23Solver;
 typedef TSDIRK34Solver<OccaVector>          OccaSDIRK34Solver;
 typedef TSDIRK33Solver<OccaVector>          OccaSDIRK33Solver;
+
+typedef TForwardEulerSolver<Ok2cVector>     Ok2cForwardEulerSolver;
+typedef TRK2Solver<Ok2cVector>              Ok2cRK2Solver;
+typedef TRK3SSPSolver<Ok2cVector>           Ok2cRK3SSPSolver;
+typedef TRK4Solver<Ok2cVector>              Ok2cRK4Solver;
+typedef TExplicitRKSolver<Ok2cVector>       Ok2cExplicitRKSolver;
+typedef TRK6Solver<Ok2cVector>              Ok2cRK6Solver;
+typedef TRK8Solver<Ok2cVector>              Ok2cRK8Solver;
+typedef TBackwardEulerSolver<Ok2cVector>    Ok2cBackwardEulerSolver;
+typedef TImplicitMidpointSolver<Ok2cVector> Ok2cImplicitMidpointSolver;
+typedef TSDIRK23Solver<Ok2cVector>          Ok2cSDIRK23Solver;
+typedef TSDIRK34Solver<Ok2cVector>          Ok2cSDIRK34Solver;
+typedef TSDIRK33Solver<Ok2cVector>          Ok2cSDIRK33Solver;
 #endif
 
 }
