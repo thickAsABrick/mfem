@@ -81,8 +81,12 @@ public:
    }
    virtual void Step(Ok2cVector &x, double &t, double &dt)
    {
-      mfem_error("ODESolver::Step(OccaVector) is not overloaded!");
+      mfem_error("ODESolver::Step(Ok2cVector) is not overloaded!");
    }
+  virtual void Step(RajaVector &x, double &t, double &dt)
+  {
+    mfem_error("ODESolver::Step(RajaVector) is not overloaded!");
+  }
 #endif
 
    /// Perform time integration from time @a t [in] to time @a tf [in].
@@ -114,6 +118,10 @@ public:
    {
       while (t < tf) { Step(x, t, dt); }
    }
+  virtual void Run(RajaVector &x, double &t, double &dt, double tf)
+  {
+    while (t < tf) { Step(x, t, dt); }
+  }
 #endif
 
    virtual ~ODESolver() { }
@@ -356,6 +364,19 @@ typedef TImplicitMidpointSolver<Ok2cVector> Ok2cImplicitMidpointSolver;
 typedef TSDIRK23Solver<Ok2cVector>          Ok2cSDIRK23Solver;
 typedef TSDIRK34Solver<Ok2cVector>          Ok2cSDIRK34Solver;
 typedef TSDIRK33Solver<Ok2cVector>          Ok2cSDIRK33Solver;
+
+typedef TForwardEulerSolver<RajaVector>     RajaForwardEulerSolver;
+typedef TRK2Solver<RajaVector>              RajaRK2Solver;
+typedef TRK3SSPSolver<RajaVector>           RajaRK3SSPSolver;
+typedef TRK4Solver<RajaVector>              RajaRK4Solver;
+typedef TExplicitRKSolver<RajaVector>       RajaExplicitRKSolver;
+typedef TRK6Solver<RajaVector>              RajaRK6Solver;
+typedef TRK8Solver<RajaVector>              RajaRK8Solver;
+typedef TBackwardEulerSolver<RajaVector>    RajaBackwardEulerSolver;
+typedef TImplicitMidpointSolver<RajaVector> RajaImplicitMidpointSolver;
+typedef TSDIRK23Solver<RajaVector>          RajaSDIRK23Solver;
+typedef TSDIRK34Solver<RajaVector>          RajaSDIRK34Solver;
+typedef TSDIRK33Solver<RajaVector>          RajaSDIRK33Solver;
 #endif
 
 }

@@ -26,7 +26,6 @@ OccaBilinearForm::OccaBilinearForm(OccaFiniteElementSpace *ofespace_) :
    Operator(ofespace_->GetVSize(),
             ofespace_->GetVSize())
 {
-   dbg();
    Init(occa::getDevice(), ofespace_, ofespace_);
 }
 
@@ -35,7 +34,6 @@ OccaBilinearForm::OccaBilinearForm(occa::device device_,
    Operator(ofespace_->GetVSize(),
             ofespace_->GetVSize())
 {
-   dbg();
    Init(device, ofespace_, ofespace_);
 }
 
@@ -44,7 +42,6 @@ OccaBilinearForm::OccaBilinearForm(OccaFiniteElementSpace *otrialFESpace_,
    Operator(otrialFESpace_->GetVSize(),
             otestFESpace_->GetVSize())
 {
-   dbg();
    Init(occa::getDevice(), otrialFESpace_, otestFESpace_);
 }
 
@@ -54,7 +51,6 @@ OccaBilinearForm::OccaBilinearForm(occa::device device_,
    Operator(otrialFESpace_->GetVSize(),
             otestFESpace_->GetVSize())
 {
-   dbg();
    Init(device, otrialFESpace_, otestFESpace_);
 }
 
@@ -62,7 +58,6 @@ void OccaBilinearForm::Init(occa::device device_,
                             OccaFiniteElementSpace *otrialFESpace_,
                             OccaFiniteElementSpace *otestFESpace_)
 {
-   dbg();
    device = device_;
 
    otrialFESpace = otrialFESpace_;
@@ -301,7 +296,6 @@ void OccaBilinearForm::InitRHS(const Array<int> &constraintList,
                                OccaVector &X, OccaVector &B,
                                int copy_interior)
 {
-   dbg();
    const Operator *P = GetTrialProlongation();
    const Operator *R = GetTrialRestriction();
 
@@ -339,7 +333,6 @@ void OccaBilinearForm::InitRHS(const Array<int> &constraintList,
 // Matrix vector multiplication.
 void OccaBilinearForm::Mult(const OccaVector &x, OccaVector &y) const
 {
-   dbg();
    otrialFESpace->GlobalToLocal(x, localX);
    localY = 0;
 
@@ -355,7 +348,6 @@ void OccaBilinearForm::Mult(const OccaVector &x, OccaVector &y) const
 // Matrix transpose vector multiplication.
 void OccaBilinearForm::MultTranspose(const OccaVector &x, OccaVector &y) const
 {
-   dbg();
    otestFESpace->GlobalToLocal(x, localX);
    localY = 0;
 
@@ -406,7 +398,6 @@ OccaConstrainedOperator::OccaConstrainedOperator(Operator *A_,
                                                  bool own_A_) :
    Operator(A_->Height(), A_->Width())
 {
-   dbg();
    Setup(occa::getDevice(), A_, constraintList_, own_A_);
 }
 
@@ -416,7 +407,6 @@ OccaConstrainedOperator::OccaConstrainedOperator(occa::device device_,
                                                  bool own_A_) :
    Operator(A_->Height(), A_->Width())
 {
-   dbg();
    Setup(device_, A_, constraintList_, own_A_);
 }
 

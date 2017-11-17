@@ -21,7 +21,6 @@ namespace mfem
 OccaVector::OccaVector() :
    size(0)
 {
-   occa::dbg();
 }
 
 /// @brief Creates vector of size s using the current OCCA device
@@ -156,7 +155,6 @@ OccaVector& OccaVector::operator = (const OccaVectorRef &ref)
 
 OccaVector& OccaVector::operator = (double value)
 {
-   occa::dbg() << "[mfem/ovector:operator=]";
    static occa::kernelBuilder builder =
       makeCustomBuilder("vector_op_eq",
                         "v0[i] = c0;");
@@ -255,7 +253,6 @@ OccaVector& OccaVector::operator += (const OccaVector &v)
 /// (*this) += a * Va
 OccaVector& OccaVector::Add(const double a, const OccaVector &Va)
 {
-   occa::dbg() << "[mfem/ovector/Add]";
    static occa::kernelBuilder builder =
       makeCustomBuilder("vector_axpy",
                         "v0[i] += c0 * v1[i];");
@@ -701,7 +698,6 @@ occa::kernelBuilder makeCustomBuilder(const std::string &kernelName,
                                       const std::string &formula,
                                       occa::properties props)
 {
-   occa::dbg() << "[mfem/ovector/makeCustomBuilder()] defaults";
    //occa::sys::printStacktrace(0,"");
    static occa::properties defaults("defines: {"
                                     "  CTYPE0: 'double',"
@@ -711,7 +707,6 @@ occa::kernelBuilder makeCustomBuilder(const std::string &kernelName,
                                     "  VTYPE2: 'double',"
                                     "  TILESIZE: 128,"
                                     "}");
-   occa::dbg();
    return occa::linalg::customLinearMethod(kernelName,
                                            formula,
                                            defaults + props);
