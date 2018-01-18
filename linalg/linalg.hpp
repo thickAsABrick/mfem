@@ -12,6 +12,8 @@
 #ifndef MFEM_LINALG
 #define MFEM_LINALG
 
+#include "../config/config.hpp"
+
 // Linear algebra header file
 
 #include "vector.hpp"
@@ -30,6 +32,12 @@
 
 #ifdef MFEM_USE_SUNDIALS
 #include "sundials.hpp"
+#endif
+
+#ifdef MFEM_USE_OCCA
+#include "osolvers.hpp"
+#include "ovector.hpp"
+#include "osparsemat.hpp"
 #endif
 
 #ifdef MFEM_USE_MPI
