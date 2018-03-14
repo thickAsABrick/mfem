@@ -109,28 +109,22 @@ public:
    virtual ~BlockNonlinearFormIntegrator() { }
 };
 
-
-/// Abstract class for hyperelastic models
-class HyperelasticModel
+/// Abstract class for nonlinear models
+class NonlinearModel
 {
 protected:
    ElementTransformation *Ttr; /**< Reference-element to target-element
                                     transformation. */
 
 public:
-   HyperelasticModel() : Ttr(NULL) { }
-   virtual ~HyperelasticModel() { }
+   NonlinearModel() : Ttr(NULL) { }
+   virtual ~NonlinearModel() { }
 
    /// A reference-element to target-element transformation that can be used to
    /// evaluate Coefficient%s.
    /** @note It is assumed that _Ttr.SetIntPoint() is already called for the
        point of interest. */
    void SetTransformation(ElementTransformation &_Ttr) { Ttr = &_Ttr; }
-
-   /** @brief Evaluate the strain energy density function, W = W(Jpt).
-       @param[in] Jpt  Represents the target->physical transformation
-                       Jacobian matrix. */
-   virtual double EvalW(const DenseMatrix &Jpt) const = 0;
 
    /** @brief Evaluate the 1st Piola-Kirchhoff stress tensor, P = P(Jpt).
        @param[in] Jpt  Represents the target->physical transformation
@@ -153,6 +147,19 @@ public:
    */
    virtual void AssembleH(const DenseMatrix &Jpt, const DenseMatrix &DS,
                           const double weight, DenseMatrix &A) const = 0;
+};
+
+
+/// Abstract class for hyperelastic models
+class HyperelasticModel : public NonlinearModel
+{
+public:
+
+   /** @brief Evaluate the strain energy density function, W = W(Jpt).
+       @param[in] Jpt  Represents the target->physical transformation
+                       Jacobian matrix. */
+   virtual double EvalW(const DenseMatrix &Jpt) const = 0;
+
 };
 
 
@@ -207,7 +214,6 @@ public:
    virtual void AssembleH(const DenseMatrix &J, const DenseMatrix &DS,
                           const double weight, DenseMatrix &A) const;
 };
-
 
 /** Hyperelastic integrator for any given HyperelasticModel.
 
